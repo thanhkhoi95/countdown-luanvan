@@ -1,9 +1,9 @@
 {
-  "name": "angular2-full-stack",
-  "version": "4.2.4",
-  "license": "MIT",
-  "author": "Davide Violante",
-  "description": "Angular Full Stack project built using Angular 2+, Express, Mongoose and Node.",
+  "name": "luan-an-tot-nghiep",
+  "version": "0.0.1",
+  "license": "",
+  "author": "Ho Ngo Thanh Khoi",
+  "description": "",
   "angular-cli": {},
   "engines": {
     "node": "6.11.4",
@@ -54,6 +54,8 @@
     "@angular/language-service": "^4.2.4",
     "@types/jasmine": "~2.5.53",
     "@types/jasminewd2": "~2.0.2",
+    "@types/mongodb": "^2.2.13",
+    "@types/mongoose": "^4.7.23",
     "@types/node": "~6.0.60",
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
