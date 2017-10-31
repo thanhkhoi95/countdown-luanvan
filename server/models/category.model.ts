@@ -21,10 +21,12 @@ const categorySchema = new mongoose.Schema(
         toJSON: {
             virtuals: true
         }
-    });
+    }
+);
+
 // Duplicate the ID field.
 categorySchema.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
-export const CategoryModel = mongoose.model<ICategoryModel>('User', categorySchema);
+export const CategoryModel = mongoose.model<ICategoryModel>('category', categorySchema);
