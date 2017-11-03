@@ -34,7 +34,7 @@ const orderSchema = new mongoose.Schema(
             }
         }],
         tableId: {
-            tpye: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
         },
         clientName: {
@@ -56,4 +56,4 @@ orderSchema.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
-export const OrderModel = mongoose.model<IOrderModel>('food', orderSchema);
+export const OrderModel = mongoose.model<IOrderModel>('order', orderSchema);

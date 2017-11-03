@@ -5,46 +5,64 @@ import * as morgan from 'morgan';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
 
-import setRoutes from './routes';
+import { userRouter } from './routes';
 
 const app = express();
 dotenv.load({ path: '.env' });
-app.set('port', (process.env.PORT || 3000));
+app.set('port', (process.env.PORT || 4061));
 
-app.use('/', express.static(path.join(__dirname, '../public')));
+
+
+// app.use('/', express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-let mongodbURI;
+app.use(function (req, res, next) {
+
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Pass to next layer of middleware
+  next();
+});
+
+app.use(morgan('dev'));
+
 if (process.env.NODE_ENV === 'test') {
-  mongodbURI = process.env.MONGODB_TEST_URI;
+  mongoose.connect(process.env.MONGODB_TEST_URI, { useMongoClient: true });
 } else {
-  mongodbURI = process.env.MONGODB_URI;
-  app.use(morgan('dev'));
+  mongoose.connect(process.env.MONGODB_URI, { useMongoClient: true });
 }
 
-mongoose.Promise = global.Promise;
-const mongodb = mongoose.connect(mongodbURI, { useMongoClient: true });
+const db = mongoose.connection;
+(<any>mongoose).Promise = global.Promise;
 
-mongodb
-  .then((db) => {
-    console.log('Connected to MongoDB on', db.host + ':' + db.port);
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', () => {
+  console.log('Connected to MongoDB');
 
-    setRoutes(app);
+  app.use('/api/user', userRouter);
 
-    app.get('/*', function(req, res) {
-      res.sendFile(path.join(__dirname, '../public/index.html'));
+  // app.get('/*', function(req, res) {
+  //   res.sendFile(path.join(__dirname, '../public/index.html'));
+  // });
+
+  if (!module.parent) {
+    app.listen(app.get('port'), () => {
+      console.log('Luanvan web service listening on port ' + app.get('port'));
     });
+  }
 
-    if (!module.parent) {
-      app.listen(app.get('port'), () => {
-        console.log('Angular Full Stack listening on port ' + app.get('port'));
-      });
-    }
-
-  })
-  .catch((err) => {
-    console.error(err);
 });
 
 export { app };
