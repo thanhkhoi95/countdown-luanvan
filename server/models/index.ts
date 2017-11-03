@@ -4,3 +4,4 @@ export * from './food.model';
 export * from './user.model';
 export * from './table.model';
 export * from './order.model';
+export * from './staff.model';
