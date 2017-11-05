@@ -5,6 +5,7 @@ interface FoodRef {
     name: string;
     price: number;
     numb: number;
+    date: Date;
 }
 
 export interface IOrder {
@@ -39,6 +40,9 @@ const orderSchema = new mongoose.Schema(
         },
         clientName: {
             type: String
+        },
+        date: {
+            type: Date
         }
     },
     {

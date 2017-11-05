@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 export interface IUser {
     id?: string;
     username: string;
-    role: string[];
+    role: string;
     salt: string;
     password: string;
 }
@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema(
             required: true
         },
         password: {
+            type: String,
+            required: true
+        },
+        role: {
             type: String,
             required: true
         }

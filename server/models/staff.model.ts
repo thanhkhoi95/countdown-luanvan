@@ -3,7 +3,7 @@ import * as mongoose from 'mongoose';
 export interface IStaff {
     id?: string;
     fullname: string;
-    birthDate: Date;
+    birthdate: Date;
     userId: string;
     gender: boolean;
 }
@@ -14,18 +14,18 @@ const staffSchema = new mongoose.Schema(
     {
         fullname: {
             type: String,
-            required: true,
-            unique: true
+            required: true
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: 'user',
+            unique: true,
+            ref: 'user'
         },
         gender: {
             type: Boolean,
             required: true
         },
-        birthDate: {
+        birthdate: {
             type: Date,
             required: true
         }

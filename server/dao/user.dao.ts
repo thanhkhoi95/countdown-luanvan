@@ -1,5 +1,71 @@
 import { IUser, UserModel } from '../models';
-import { IError } from '../shared';
+import { IError, cryptoUtils } from '../shared';
+
+function getSalt(username: string): Promise<string | IError> {
+    return UserModel.findOne({ username: username })
+        .then(
+        (responsedUser: IUser) => Promise.resolve(responsedUser.salt)
+        )
+        .catch(
+        error => Promise.reject({
+            statusCode: 500,
+            message: 'Internal server error.'
+        })
+        );
+}
+
+function checkPassword(username: string, password: string): Promise<boolean | IError> {
+    return userDao.getSalt(username)
+        .then(
+        salt => {
+            const hashPassword = cryptoUtils.hashWithSalt(password, <string>salt).password;
+            return UserModel.findOne({ username: username })
+                .then(
+                (responsedUser: IUser) => Promise.resolve(responsedUser.password === hashPassword)
+                )
+                .catch(
+                error => Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                })
+                );
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
+function updatePassword(username: string, { password, salt }) {
+    return UserModel.findOne({ username: username })
+        .then(
+        (responsedUser: IUser) => {
+            responsedUser.password = password;
+            responsedUser.salt = salt;
+            return updateUser(responsedUser)
+                .then(
+                () => Promise.resolve()
+                )
+                .catch(
+                error => Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                })
+                );
+        }
+        )
+        .catch(
+        error => Promise.reject({
+            statusCode: 500,
+            message: 'Internal server error.'
+        })
+        );
+}
 
 function updateUser(user: IUser): Promise<IUser | IError> {
     const updatedUser = new UserModel(user);
@@ -53,7 +119,28 @@ function insertUser(user: IUser): Promise<IUser | IError> {
         );
 }
 
+function deleteUser(username: string): Promise<any> {
+    return UserModel.findOneAndRemove({ username: username })
+        .then(
+            () => {
+                return Promise.resolve('Delete user successfully.');
+            }
+        )
+        .catch(
+            () => {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            }
+        );
+}
+
 export const userDao = {
     updateUser: updateUser,
-    insertUser: insertUser
+    insertUser: insertUser,
+    getSalt: getSalt,
+    checkPassword: checkPassword,
+    updatePassword: updatePassword,
+    deleteUser: deleteUser
 };

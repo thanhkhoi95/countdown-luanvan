@@ -5,7 +5,7 @@ import * as morgan from 'morgan';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
 
-import { userRouter } from './routes';
+import { userRouter, staffRouter } from './routes';
 
 const app = express();
 dotenv.load({ path: '.env' });
@@ -52,6 +52,7 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 
   app.use('/api/user', userRouter);
+  app.use('/api/staff', staffRouter);
 
   // app.get('/*', function(req, res) {
   //   res.sendFile(path.join(__dirname, '../public/index.html'));

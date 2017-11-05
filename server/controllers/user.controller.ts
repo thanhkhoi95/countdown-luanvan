@@ -10,17 +10,56 @@ function changePassword(request: express.Request): Promise<ISuccess | IError> {
         };
         return Promise.reject(error);
     } else {
-        return userDao.updateUser(request.body)
+        return userDao.getSalt(request.body.username)
             .then(
-            response => Promise.resolve({
-                message: 'Password changed successfully',
-                data: {
-                    user: response
-                }
-            })
+            salt => {
+                return userDao.checkPassword(request.body.username, request.body.oldPassword)
+                    .then(
+                    response => {
+                        if (response === true) {
+                            return userDao.updatePassword(request.body.username, cryptoUtils.hashWithSalt(request.body.newPassword))
+                                .then(
+                                () => Promise.resolve({
+                                    message: 'Password changed successfully',
+                                    data: {}
+                                })
+                                )
+                                .catch(
+                                error => Promise.reject(error)
+                                );
+                        } else {
+                            return Promise.reject({
+                                statusCode: 404,
+                                message: 'Wrong password.'
+                            })
+                        }
+                    }
+                    )
+                    .catch(
+                    error => {
+                        if (!error.statusCode) {
+                            return Promise.reject({
+                                statusCode: 500,
+                                message: 'Internal server error.'
+                            });
+                        } else {
+                            return Promise.reject(error);
+                        }
+                    }
+                    );
+            }
             )
             .catch(
-            error => Promise.reject(error)
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
+            }
             );
     }
 }
