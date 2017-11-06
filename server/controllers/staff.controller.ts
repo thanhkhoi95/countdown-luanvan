@@ -25,7 +25,8 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
                 birthdate: request.body.birthdate,
                 fullname: request.body.fullname,
                 gender: request.body.gender,
-                userId: responsedUser.id
+                userId: responsedUser.id,
+                active: true
             };
             return staffDao.insertStaff(newStaff)
                 .then(
@@ -65,13 +66,13 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
 
 function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.removeStaff(request.query.id)
-    .then(
+        .then(
         () => Promise.resolve({
             message: 'Delete staff successfully.',
             data: {}
         })
-    )
-    .catch(
+        )
+        .catch(
         (error) => {
             if (!error.statusCode) {
                 return Promise.reject({
@@ -82,10 +83,139 @@ function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
                 return Promise.reject(error);
             }
         }
-    );
+        );
+}
+
+function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
+    return staffDao.getOriginStaff(request.query.id)
+        .then(
+        (responsedStaff) => {
+            const staff: IStaff = {
+                id: request.query.id,
+                fullname: responsedStaff.fullname,
+                birthdate: responsedStaff.birthdate,
+                gender: responsedStaff.gender,
+                userId: responsedStaff.userId,
+                active: request.query.state
+            };
+            return staffDao.updatedStaff(staff)
+                .then(
+                (deactivatedStaff) => {
+                    return Promise.resolve({
+                        message: 'Deactivate staff successfully.',
+                        data: {
+                            staff: deactivatedStaff
+                        }
+                    });
+                }
+                )
+                .catch(
+                (error) => {
+                    if (!error.statusCode) {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    } else {
+                        return Promise.reject(error);
+                    }
+                }
+                );
+        }
+        )
+        .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function getStaff(request: express.Request): Promise<ISuccess | IError> {
+    return staffDao.getPopulatedStaff(request.query.id)
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get staff successfully.',
+            data: {
+                staff: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function updateStaff(request: express.Request) {
+    return staffDao.getOriginStaff(request.query.id)
+        .then(
+        (responsedStaff) => {
+            const staff: IStaff = {
+                id: request.query.id,
+                fullname: request.query.fullname,
+                birthdate: request.query.birthdate,
+                gender: request.query.gender,
+                userId: responsedStaff.userId,
+                active: request.query.state
+            };
+            return staffDao.updatedStaff(staff)
+                .then(
+                (updatedStaff) => {
+                    return Promise.resolve({
+                        message: 'Update staff successfully.',
+                        data: {
+                            staff: updatedStaff
+                        }
+                    });
+                }
+                )
+                .catch(
+                (error) => {
+                    if (!error.statusCode) {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    } else {
+                        return Promise.reject(error);
+                    }
+                }
+                );
+        }
+        )
+        .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
 }
 
 export const staffController = {
     createStaff: createStaff,
-    deleteStaff: deleteStaff
+    // deleteStaff: deleteStaff
+    setActiveStaff: setActiveStaff,
+    getStaff: getStaff,
+    updateStaff: updateStaff
 };
