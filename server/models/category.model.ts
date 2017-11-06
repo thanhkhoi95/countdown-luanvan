@@ -3,6 +3,7 @@ import * as mongoose from 'mongoose';
 export interface ICategory {
     id?: string;
     name: string;
+    active: boolean;
 }
 
 export interface ICategoryModel extends ICategory, mongoose.Document { }
@@ -13,6 +14,11 @@ const categorySchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true
+        },
+        active: {
+            type: Boolean,
+            default: true,
+            required: true
         }
     },
     {

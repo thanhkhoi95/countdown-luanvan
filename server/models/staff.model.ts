@@ -6,6 +6,7 @@ export interface IStaff {
     birthdate: Date;
     userId: string;
     gender: boolean;
+    active: boolean;
 }
 
 export interface IStaffModel extends IStaff, mongoose.Document { }
@@ -28,6 +29,10 @@ const staffSchema = new mongoose.Schema(
         birthdate: {
             type: Date,
             required: true
+        },
+        active: {
+            type: Boolean,
+            required: true
         }
     },
     {
@@ -43,6 +48,10 @@ const staffSchema = new mongoose.Schema(
 // Duplicate the ID field.
 staffSchema.virtual('id').get(function () {
     return this._id.toHexString();
+});
+
+staffSchema.pre('remove', function(next) {
+    this.model('user').remove({ _id: this.userId }, next);
 });
 
 export const StaffModel = mongoose.model<IStaffModel>('staff', staffSchema);

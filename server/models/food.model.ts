@@ -10,6 +10,7 @@ export interface IFood {
     price: number;
     pictures: string[];
     categories: CategoryRef[];
+    active: boolean;
 }
 
 export interface IFoodModel extends IFood, mongoose.Document { }
@@ -30,7 +31,12 @@ const foodSchema = new mongoose.Schema(
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'category'
             }
-        }]
+        }],
+        active: {
+            type: Boolean,
+            default: true,
+            required: true
+        }
     },
     {
         toObject: {

@@ -18,3 +18,19 @@ staffRouter.route('/').post((req: express.Request, res: express.Response, next: 
         }
         );
 });
+
+staffRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    staffController.deleteStaff(req)
+        .then(
+        response => {
+            res.send(response);
+        }
+        )
+        .catch(
+        error => {
+            res.status(error.statusCode).send({
+                message: error.message
+            });
+        }
+        );
+});

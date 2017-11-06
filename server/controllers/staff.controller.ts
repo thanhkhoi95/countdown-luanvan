@@ -4,6 +4,13 @@ import { userDao, staffDao } from '../dao';
 import { IUser, IUserModel, IStaff } from '../models';
 
 function createStaff(request: express.Request): Promise<ISuccess | IError> {
+    if (!request.body.username || !request.body.password ||
+        !request.body.fullname || !request.body.birthdate || !request.body.gender) {
+        return Promise.reject({
+            statusCode: 404,
+            message: 'Data fields missing.'
+        });
+    }
     const passwordObject = cryptoUtils.hashWithSalt(request.body.password);
     const newUser: IUser = {
         username: request.body.username,
@@ -33,7 +40,7 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
                 )
                 .catch(
                 () => {
-                    userDao.deleteUser(responsedUser.username).then(()=>{}).catch(()=>{});
+                    userDao.deleteUser(responsedUser.username).then(() => { }).catch(() => { });
                     return Promise.reject({
                         statusCode: 500,
                         message: 'Internal server error.'
@@ -56,6 +63,29 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
+function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
+    return staffDao.removeStaff(request.query.id)
+    .then(
+        () => Promise.resolve({
+            message: 'Delete staff successfully.',
+            data: {}
+        })
+    )
+    .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+    );
+}
+
 export const staffController = {
-    createStaff: createStaff
+    createStaff: createStaff,
+    deleteStaff: deleteStaff
 };
