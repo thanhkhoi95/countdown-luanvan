@@ -1,8 +1,12 @@
 import { StaffModel, IStaff, IStaffModel } from '../models';
+import { paginate } from '../shared';
 
 function convertToResponseObject(staff) {
     return {
-        fullname: staff.fullname,
+        firstname: staff.firstname,
+        lowercaseFirstname: staff.lowercaseFirstname,
+        lastname: staff.lastname,
+        lowercaseLastname: staff.lowercaseLastname,
         birthdate: staff.birthdate,
         gender: staff.gender ? 'male' : 'female',
         username: staff.userId.username,
@@ -136,18 +140,70 @@ function removeStaff(staffId: string): Promise<any> {
 }
 
 function updateStaff(staff: IStaff): Promise<any> {
-    return StaffModel.findOneAndUpdate({_id: staff.id}, staff)
+    return StaffModel.findOne({ _id: staff.id })
         .then(
         (responsedStaff) => {
-            responsedStaff = new StaffModel(responsedStaff);
-            return responsedStaff.populate('userId').execPopulate()
+            responsedStaff.firstname = staff.firstname;
+            responsedStaff.lastname = staff.lastname;
+            responsedStaff.gender = staff.gender;
+            responsedStaff.active = staff.active;
+            responsedStaff.birthdate = staff.birthdate;
+            return responsedStaff.save()
                 .then(
-                (populatedStaff: IStaff) => {
-                    populatedStaff.active = staff.active;
-                    populatedStaff.fullname = staff.fullname;
-                    populatedStaff.birthdate = staff.birthdate;
-                    populatedStaff.gender = staff.gender;
-                    return Promise.resolve(convertToResponseObject(populatedStaff));
+                updatedStaff => {
+                    return updatedStaff.populate('userId').execPopulate()
+                        .then(
+                        (populatedStaff: IStaff) => {
+                            return Promise.resolve(convertToResponseObject(populatedStaff));
+                        }
+                        )
+                        .catch(
+                        error => {
+                            return Promise.reject({
+                                statusCode: 500,
+                                message: 'Internal server error.'
+                            });
+                        }
+                        );
+                }
+                )
+                .catch(
+                error => {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                }
+                );
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
+function getAllStaffs(pageIndex: number, pageSize: number): Promise<any> {
+    return StaffModel.count({})
+        .then(
+        (count: number) => {
+            return StaffModel.find({}).sort({ firstname: -1 })
+                .skip((pageIndex > 0) ? (pageIndex - 1) * pageSize : 0)
+                .limit(pageSize)
+                .populate('userId')
+                .then(
+                staffs => {
+                    const response = paginate(staffs, count, pageIndex, pageSize);
+                    for (const i in response.items) {
+                        if (response.items[i]) {
+                            response.items[i] = convertToResponseObject(response.items[i]);
+                        }
+                    }
+                    return Promise.resolve(response);
                 }
                 )
                 .catch(
@@ -175,5 +231,6 @@ export const staffDao = {
     removeStaff: removeStaff,
     updatedStaff: updateStaff,
     getOriginStaff: getOriginStaff,
-    getPopulatedStaff: getPopulatedStaff
+    getPopulatedStaff: getPopulatedStaff,
+    getAllStaffs: getAllStaffs
 };

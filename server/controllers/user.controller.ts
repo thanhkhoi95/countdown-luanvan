@@ -31,7 +31,7 @@ function changePassword(request: express.Request): Promise<ISuccess | IError> {
                             return Promise.reject({
                                 statusCode: 404,
                                 message: 'Wrong password.'
-                            })
+                            });
                         }
                     }
                     )

@@ -1,8 +1,12 @@
 import * as mongoose from 'mongoose';
+import * as diacritics from 'diacritics';
 
 export interface IStaff {
     id?: string;
-    fullname: string;
+    firstname: string;
+    lowercaseFirstname?: string;
+    lastname: string;
+    lowercaseLastname?: string;
     birthdate: Date;
     userId: string;
     gender: boolean;
@@ -13,7 +17,17 @@ export interface IStaffModel extends IStaff, mongoose.Document { }
 
 const staffSchema = new mongoose.Schema(
     {
-        fullname: {
+        firstname: {
+            type: String,
+            required: true
+        },
+        lowercaseFirstname: {
+            type: String
+        },
+        lowercaseLastname: {
+            type: String
+        },
+        lastname: {
             type: String,
             required: true
         },
@@ -32,7 +46,8 @@ const staffSchema = new mongoose.Schema(
         },
         active: {
             type: Boolean,
-            required: true
+            required: true,
+            default: true
         }
     },
     {
@@ -52,6 +67,12 @@ staffSchema.virtual('id').get(function () {
 
 staffSchema.pre('remove', function(next) {
     this.model('user').remove({ _id: this.userId }, next);
+});
+
+staffSchema.pre('save', function(next){
+    this.lowercaseFirstname = diacritics.remove(this.firstname.toLowerCase());
+    this.lowercaseLastname = diacritics.remove(this.lastname.toLowerCase());
+    next();
 });
 
 export const StaffModel = mongoose.model<IStaffModel>('staff', staffSchema);

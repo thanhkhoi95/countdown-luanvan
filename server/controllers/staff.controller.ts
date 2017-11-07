@@ -5,7 +5,8 @@ import { IUser, IUserModel, IStaff } from '../models';
 
 function createStaff(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.username || !request.body.password ||
-        !request.body.fullname || !request.body.birthdate || !request.body.gender) {
+        !request.body.firstname || !request.body.lastname ||
+        !request.body.birthdate || !request.body.gender) {
         return Promise.reject({
             statusCode: 404,
             message: 'Data fields missing.'
@@ -23,7 +24,8 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         (responsedUser: IUser) => {
             const newStaff: IStaff = {
                 birthdate: request.body.birthdate,
-                fullname: request.body.fullname,
+                firstname: request.body.firstname,
+                lastname: request.body.lastname,
                 gender: request.body.gender,
                 userId: responsedUser.id,
                 active: true
@@ -92,7 +94,8 @@ function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
         (responsedStaff) => {
             const staff: IStaff = {
                 id: request.query.id,
-                fullname: responsedStaff.fullname,
+                firstname: responsedStaff.firstname,
+                lastname: responsedStaff.lastname,
                 birthdate: responsedStaff.birthdate,
                 gender: responsedStaff.gender,
                 userId: responsedStaff.userId,
@@ -161,17 +164,21 @@ function getStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function updateStaff(request: express.Request) {
+function updateStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.getOriginStaff(request.query.id)
         .then(
         (responsedStaff) => {
+            if (request.body.gender === undefined) {
+                request.body.gender = responsedStaff.gender;
+            }
             const staff: IStaff = {
                 id: request.query.id,
-                fullname: request.query.fullname,
-                birthdate: request.query.birthdate,
-                gender: request.query.gender,
+                firstname: request.body.firstname || responsedStaff.firstname,
+                lastname: request.body.lastname || responsedStaff.lastname,
+                birthdate: request.body.birthdate || responsedStaff.birthdate,
+                gender: request.body.gender,
                 userId: responsedStaff.userId,
-                active: request.query.state
+                active: responsedStaff.active
             };
             return staffDao.updatedStaff(staff)
                 .then(
@@ -212,10 +219,41 @@ function updateStaff(request: express.Request) {
         );
 }
 
+function getStaffList(request: express.Request): Promise<ISuccess | IError> {
+    if (!request.query.pageindex) {
+        request.query.pageindex = '1';
+    }
+    if (!request.query.pagesize) {
+        request.query.pagesize = '20';
+    }
+    return staffDao.getAllStaffs(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+    .then(
+        (response) => Promise.resolve({
+            message: 'Get staff successfully.',
+            data: {
+                staff: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
 export const staffController = {
     createStaff: createStaff,
     // deleteStaff: deleteStaff
     setActiveStaff: setActiveStaff,
     getStaff: getStaff,
-    updateStaff: updateStaff
+    updateStaff: updateStaff,
+    getStaffList: getStaffList
 };
