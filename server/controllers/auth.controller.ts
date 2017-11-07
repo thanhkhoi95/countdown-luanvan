@@ -2,6 +2,7 @@ import * as express from 'express';
 import { IError, ISuccess, cryptoUtils, tokenSign } from '../shared';
 import { userDao, staffDao } from '../dao';
 import { IUser, IUserModel, IStaff } from '../models';
+import config from '../config';
 
 function login(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.username || !request.body.password) {
@@ -11,6 +12,33 @@ function login(request: express.Request): Promise<ISuccess | IError> {
         };
         return Promise.reject(error);
     }
+    if (request.body.username === config.admin.username &&
+        request.body.password === config.admin.password) {
+            const tokenObject = {
+                role: 'admin'
+            };
+            const promise = new Promise<ISuccess | IError>((resolve, reject) => {
+                tokenSign(tokenObject, (err, token) => {
+                    if (!err) {
+                        resolve({
+                            message: 'Login successfully.',
+                            data: {
+                                info: {
+                                    role: 'admin'
+                                },
+                                token: token
+                            }
+                        });
+                    } else {
+                        reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    }
+                });
+            });
+            return promise;
+        }
     return userDao.checkPassword(request.body.username, request.body.password)
         .then(
         (flag) => {
@@ -22,6 +50,12 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                             return staffDao.getPopulatedStaffByUserId(user.id)
                                 .then(
                                 (staff) => {
+                                    if (staff.active === false) {
+                                        return Promise.reject({
+                                            statusCode: 400,
+                                            message: 'Wrong username or password.'
+                                        });
+                                    }
                                     const tokenObject = {
                                         role: staff,
                                         ownerId: staff.id,

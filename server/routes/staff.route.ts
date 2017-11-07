@@ -36,7 +36,7 @@ staffRouter.route('/').post((req: express.Request, res: express.Response, next: 
         );
 });
 
-staffRouter.route('/setactive').put((req: express.Request, res: express.Response, next: express.NextFunction) => {
+staffRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
     staffController.setActiveStaff(req)
         .then(
         response => {

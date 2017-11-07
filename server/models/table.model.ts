@@ -1,8 +1,10 @@
 import * as mongoose from 'mongoose';
+import * as diacritics from 'diacritics';
 
 export interface ITable {
     id?: string;
     name: string;
+    lowercaseName?: string;
     userId: string;
     active: boolean;
 }
@@ -15,6 +17,9 @@ const tableSchema = new mongoose.Schema(
             type: String,
             required: true,
             unique: true
+        },
+        lowercaseName: {
+            type: String
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -45,6 +50,11 @@ tableSchema.virtual('id').get(function () {
 
 tableSchema.pre('remove', function(next) {
     this.model('user').remove({ _id: this.userId }, next);
+});
+
+tableSchema.pre('save', function(next){
+    this.lowercaseName = diacritics.remove(this.name.toLowerCase());
+    next();
 });
 
 export const TableModel = mongoose.model<ITableModel>('table', tableSchema);

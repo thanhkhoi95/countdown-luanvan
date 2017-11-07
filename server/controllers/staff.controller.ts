@@ -66,27 +66,27 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
-    return staffDao.removeStaff(request.query.id)
-        .then(
-        () => Promise.resolve({
-            message: 'Delete staff successfully.',
-            data: {}
-        })
-        )
-        .catch(
-        (error) => {
-            if (!error.statusCode) {
-                return Promise.reject({
-                    statusCode: 500,
-                    message: 'Internal server error.'
-                });
-            } else {
-                return Promise.reject(error);
-            }
-        }
-        );
-}
+// function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
+//     return staffDao.removeStaff(request.query.id)
+//         .then(
+//         () => Promise.resolve({
+//             message: 'Delete staff successfully.',
+//             data: {}
+//         })
+//         )
+//         .catch(
+//         (error) => {
+//             if (!error.statusCode) {
+//                 return Promise.reject({
+//                     statusCode: 500,
+//                     message: 'Internal server error.'
+//                 });
+//             } else {
+//                 return Promise.reject(error);
+//             }
+//         }
+//         );
+// }
 
 function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.getOriginStaff(request.query.id)
