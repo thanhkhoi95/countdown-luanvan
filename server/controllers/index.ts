@@ -5,3 +5,4 @@
 export * from './staff.controller';
 // export * from './table.controller';
 export * from './user.controller';
+export * from './auth.controller';

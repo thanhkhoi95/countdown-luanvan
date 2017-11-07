@@ -141,7 +141,7 @@ function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function getStaff(request: express.Request): Promise<ISuccess | IError> {
-    return staffDao.getPopulatedStaff(request.query.id)
+    return staffDao.getPopulatedStaffById(request.query.id)
         .then(
         (response) => Promise.resolve({
             message: 'Get staff successfully.',

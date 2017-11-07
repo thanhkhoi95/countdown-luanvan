@@ -5,7 +5,7 @@ import * as morgan from 'morgan';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
 
-import { userRouter, staffRouter } from './routes';
+import { userRouter, staffRouter, authRouter } from './routes';
 
 const app = express();
 dotenv.load({ path: '.env' });
@@ -53,6 +53,7 @@ db.once('open', () => {
 
   app.use('/api/user', userRouter);
   app.use('/api/staff', staffRouter);
+  app.use('/api/auth', authRouter);
 
   // app.get('/*', function(req, res) {
   //   res.sendFile(path.join(__dirname, '../public/index.html'));

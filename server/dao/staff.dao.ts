@@ -11,12 +11,54 @@ function convertToResponseObject(staff) {
         gender: staff.gender ? 'male' : 'female',
         username: staff.userId.username,
         id: staff.id,
+        role: staff.role,
         active: staff.active
     };
 }
 
-function getPopulatedStaff(staffId: string): Promise<any> {
+function getPopulatedStaffById(staffId: string): Promise<any> {
     return StaffModel.findOne({ _id: staffId })
+        .then(
+        (responsedStaff) => {
+            if (responsedStaff) {
+                return responsedStaff.populate('userId').execPopulate()
+                    .then(
+                    (populatedStaff: IStaff) => {
+                        return Promise.resolve(convertToResponseObject(populatedStaff));
+                    }
+                    )
+                    .catch(
+                    error => {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    }
+                    );
+            } else {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'Staff not found.'
+                });
+            }
+        }
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function getPopulatedStaffByUserId(userId: string): Promise<any> {
+    return StaffModel.findOne({ userId: userId })
         .then(
         (responsedStaff) => {
             if (responsedStaff) {
@@ -231,6 +273,7 @@ export const staffDao = {
     removeStaff: removeStaff,
     updatedStaff: updateStaff,
     getOriginStaff: getOriginStaff,
-    getPopulatedStaff: getPopulatedStaff,
+    getPopulatedStaffById: getPopulatedStaffById,
+    getPopulatedStaffByUserId: getPopulatedStaffByUserId,
     getAllStaffs: getAllStaffs
 };

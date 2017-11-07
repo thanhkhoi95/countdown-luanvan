@@ -4,18 +4,33 @@ import { IError, cryptoUtils } from '../shared';
 function getSalt(username: string): Promise<string | IError> {
     return UserModel.findOne({ username: username })
         .then(
-        (responsedUser: IUser) => Promise.resolve(responsedUser.salt)
+        (responsedUser: IUser) => {
+            if (responsedUser) {
+                return Promise.resolve(responsedUser.salt);
+            } else {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'User does not exist.'
+                });
+            }
+        }
         )
         .catch(
-        error => Promise.reject({
-            statusCode: 500,
-            message: 'Internal server error.'
-        })
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
         );
 }
 
 function checkPassword(username: string, password: string): Promise<boolean | IError> {
-    return userDao.getSalt(username)
+    return getSalt(username)
         .then(
         salt => {
             const hashPassword = cryptoUtils.hashWithSalt(password, <string>salt).password;
@@ -33,10 +48,14 @@ function checkPassword(username: string, password: string): Promise<boolean | IE
         )
         .catch(
         error => {
-            return Promise.reject({
-                statusCode: 500,
-                message: 'Internal server error.'
-            });
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
         }
         );
 }
@@ -122,17 +141,45 @@ function insertUser(user: IUser): Promise<IUser | IError> {
 function deleteUser(username: string): Promise<any> {
     return UserModel.findOneAndRemove({ username: username })
         .then(
-            () => {
-                return Promise.resolve('Delete user successfully.');
-            }
+        () => {
+            return Promise.resolve('Delete user successfully.');
+        }
         )
         .catch(
-            () => {
+        () => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
+function getUser(username: string): Promise<IUser> {
+    return UserModel.findOne({ username: username })
+        .then(
+        (user) => {
+            if (user) {
+                return Promise.resolve(user);
+            } else {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'User not found.'
+                });
+            }
+        }
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
                 return Promise.reject({
                     statusCode: 500,
                     message: 'Internal server error.'
                 });
+            } else {
+                return Promise.reject(error);
             }
+        }
         );
 }
 
@@ -142,5 +189,6 @@ export const userDao = {
     getSalt: getSalt,
     checkPassword: checkPassword,
     updatePassword: updatePassword,
-    deleteUser: deleteUser
+    deleteUser: deleteUser,
+    getUser: getUser
 };
