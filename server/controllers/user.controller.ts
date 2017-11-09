@@ -3,7 +3,7 @@ import { IError, ISuccess, cryptoUtils } from '../shared';
 import { userDao } from '../dao';
 
 function changePassword(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.body || !request.body.oldPassword || !request.body.newPassword) {
+    if (!request.body.oldPassword || !request.body.newPassword) {
         const error: IError = {
             statusCode: 400,
             message: 'Data fields missing.'

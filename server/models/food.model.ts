@@ -7,6 +7,7 @@ interface CategoryRef {
 export interface IFood {
     id?: string;
     name: string;
+    description: string;
     price: number;
     pictures: string[];
     categories: CategoryRef[];
@@ -18,6 +19,10 @@ export interface IFoodModel extends IFood, mongoose.Document { }
 const foodSchema = new mongoose.Schema(
     {
         name: {
+            type: String,
+            required: true
+        },
+        descripttion: {
             type: String,
             required: true
         },

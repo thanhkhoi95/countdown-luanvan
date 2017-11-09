@@ -271,7 +271,7 @@ function getAllStaffs(pageIndex: number, pageSize: number): Promise<any> {
 export const staffDao = {
     insertStaff: insertStaff,
     removeStaff: removeStaff,
-    updatedStaff: updateStaff,
+    updateStaff: updateStaff,
     getOriginStaff: getOriginStaff,
     getPopulatedStaffById: getPopulatedStaffById,
     getPopulatedStaffByUserId: getPopulatedStaffByUserId,

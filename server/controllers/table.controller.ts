@@ -25,24 +25,28 @@ function createTable(request: express.Request): Promise<ISuccess | IError> {
                 userId: responsedUser.id,
                 active: true
             };
-            return tableDao.insertStaff(newTable)
+            return tableDao.insertTable(newTable)
                 .then(
                 (responsedTable) => {
                     return Promise.resolve({
                         message: 'Create new table successfully.',
                         data: {
-                            staff: responsedTable
+                            table: responsedTable
                         }
                     });
                 }
                 )
                 .catch(
-                () => {
+                (error) => {
                     userDao.deleteUser(responsedUser.username).then(() => { }).catch(() => { });
-                    return Promise.reject({
-                        statusCode: 500,
-                        message: 'Internal server error.'
-                    });
+                    if (!error.statusCode) {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    } else {
+                        return Promise.reject(error);
+                    }
                 }
                 );
         }
@@ -71,13 +75,13 @@ function setActiveTable(request: express.Request): Promise<ISuccess | IError> {
                 userId: responsedTable.userId,
                 active: request.query.state
             };
-            return staffDao.updatedStaff(table)
+            return tableDao.updateTable(table)
                 .then(
                 (deactivatedTable) => {
                     return Promise.resolve({
                         message: 'Deactivate table successfully.',
                         data: {
-                            staff: deactivatedTable
+                            table: deactivatedTable
                         }
                     });
                 }
@@ -147,13 +151,13 @@ function updateTable(request: express.Request): Promise<ISuccess | IError> {
                 userId: responsedTable.userId,
                 active: responsedTable.active
             };
-            return tableDao.updatedTable(table)
+            return tableDao.updateTable(table)
                 .then(
                 (updatedTable) => {
                     return Promise.resolve({
                         message: 'Update table successfully.',
                         data: {
-                            staff: updatedTable
+                            table: updatedTable
                         }
                     });
                 }
@@ -196,9 +200,9 @@ function getTableList(request: express.Request): Promise<ISuccess | IError> {
     return tableDao.getAllTables(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
     .then(
         (response) => Promise.resolve({
-            message: 'Get staff successfully.',
+            message: 'Get tables successfully.',
             data: {
-                staff: response
+                tables: response
             }
         })
         )
@@ -216,9 +220,8 @@ function getTableList(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-export const staffController = {
+export const tableController = {
     createTable: createTable,
-    // deleteStaff: deleteStaff
     setActiveTable: setActiveTable,
     getTable: getTable,
     updateTable: updateTable,

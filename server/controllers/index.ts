@@ -3,6 +3,8 @@
 // export * from './food.controller';
 // export * from './order.controller';
 export * from './staff.controller';
-// export * from './table.controller';
+export * from './table.controller';
 export * from './user.controller';
 export * from './auth.controller';
+export * from './kitchen.controller';
+export * from './category.controller';

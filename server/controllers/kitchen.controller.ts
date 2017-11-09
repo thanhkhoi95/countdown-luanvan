@@ -1,12 +1,10 @@
 import * as express from 'express';
 import { IError, ISuccess, cryptoUtils } from '../shared';
-import { userDao, staffDao } from '../dao';
-import { IUser, IUserModel, IStaff } from '../models';
+import { userDao, kitchenDao } from '../dao';
+import { IUser, IUserModel, IKitchen } from '../models';
 
-function createStaff(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.body.username || !request.body.password ||
-        !request.body.firstname || !request.body.lastname ||
-        !request.body.birthdate || !request.body.gender) {
+function createKitchen(request: express.Request): Promise<ISuccess | IError> {
+    if (!request.body.username || !request.body.password || !request.body.name) {
         return Promise.reject({
             statusCode: 404,
             message: 'Data fields missing.'
@@ -17,26 +15,23 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         username: request.body.username,
         password: passwordObject.password,
         salt: passwordObject.salt,
-        role: 'staff'
+        role: 'kitchen'
     };
     return userDao.insertUser(newUser)
         .then(
         (responsedUser: IUser) => {
-            const newStaff: IStaff = {
-                birthdate: request.body.birthdate,
-                firstname: request.body.firstname,
-                lastname: request.body.lastname,
-                gender: request.body.gender,
+            const newKitchen: IKitchen = {
+                name: request.body.name,
                 userId: responsedUser.id,
                 active: true
             };
-            return staffDao.insertStaff(newStaff)
+            return kitchenDao.insertKitchen(newKitchen)
                 .then(
-                (responsedStaff) => {
+                (responsedKitchen) => {
                     return Promise.resolve({
-                        message: 'Create new staff successfully.',
+                        message: 'Create new kitchen successfully.',
                         data: {
-                            staff: responsedStaff
+                            kitchen: responsedKitchen
                         }
                     });
                 }
@@ -70,48 +65,23 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-// function deleteStaff(request: express.Request): Promise<ISuccess | IError> {
-//     return staffDao.removeStaff(request.query.id)
-//         .then(
-//         () => Promise.resolve({
-//             message: 'Delete staff successfully.',
-//             data: {}
-//         })
-//         )
-//         .catch(
-//         (error) => {
-//             if (!error.statusCode) {
-//                 return Promise.reject({
-//                     statusCode: 500,
-//                     message: 'Internal server error.'
-//                 });
-//             } else {
-//                 return Promise.reject(error);
-//             }
-//         }
-//         );
-// }
-
-function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
-    return staffDao.getOriginStaff(request.query.id)
+function setActiveKitchen(request: express.Request): Promise<ISuccess | IError> {
+    return kitchenDao.getOriginKitchen(request.query.id)
         .then(
-        (responsedStaff) => {
-            const staff: IStaff = {
+        (responsedKitchen) => {
+            const kitchen: IKitchen = {
                 id: request.query.id,
-                firstname: responsedStaff.firstname,
-                lastname: responsedStaff.lastname,
-                birthdate: responsedStaff.birthdate,
-                gender: responsedStaff.gender,
-                userId: responsedStaff.userId,
+                name: responsedKitchen.name,
+                userId: responsedKitchen.userId,
                 active: request.query.state
             };
-            return staffDao.updateStaff(staff)
+            return kitchenDao.updateKitchen(kitchen)
                 .then(
-                (deactivatedStaff) => {
+                (deactivatedKitchen) => {
                     return Promise.resolve({
-                        message: 'Deactivate staff successfully.',
+                        message: 'Deactivate kitchen successfully.',
                         data: {
-                            staff: deactivatedStaff
+                            kitchen: deactivatedKitchen
                         }
                     });
                 }
@@ -144,13 +114,13 @@ function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function getStaff(request: express.Request): Promise<ISuccess | IError> {
-    return staffDao.getPopulatedStaffById(request.query.id)
+function getKitchen(request: express.Request): Promise<ISuccess | IError> {
+    return kitchenDao.getPopulatedKitchenById(request.query.id)
         .then(
         (response) => Promise.resolve({
-            message: 'Get staff successfully.',
+            message: 'Get kitchen successfully.',
             data: {
-                staff: response
+                kitchen: response
             }
         })
         )
@@ -168,29 +138,26 @@ function getStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function updateStaff(request: express.Request): Promise<ISuccess | IError> {
-    return staffDao.getOriginStaff(request.query.id)
+function updateKitchen(request: express.Request): Promise<ISuccess | IError> {
+    return kitchenDao.getOriginKitchen(request.query.id)
         .then(
-        (responsedStaff) => {
+        (responsedKitchen ) => {
             if (request.body.gender === undefined) {
-                request.body.gender = responsedStaff.gender;
+                request.body.gender = responsedKitchen.gender;
             }
-            const staff: IStaff = {
+            const kitchen: IKitchen = {
                 id: request.query.id,
-                firstname: request.body.firstname || responsedStaff.firstname,
-                lastname: request.body.lastname || responsedStaff.lastname,
-                birthdate: request.body.birthdate || responsedStaff.birthdate,
-                gender: request.body.gender,
-                userId: responsedStaff.userId,
-                active: responsedStaff.active
+                name: request.body.name || responsedKitchen.name,
+                userId: responsedKitchen.userId,
+                active: responsedKitchen.active
             };
-            return staffDao.updateStaff(staff)
+            return kitchenDao.updateKitchen(kitchen)
                 .then(
-                (updatedStaff) => {
+                (updatedKitchen) => {
                     return Promise.resolve({
-                        message: 'Update staff successfully.',
+                        message: 'Update kitchen successfully.',
                         data: {
-                            staff: updatedStaff
+                            kitchen: updatedKitchen
                         }
                     });
                 }
@@ -223,19 +190,19 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function getStaffList(request: express.Request): Promise<ISuccess | IError> {
+function getKitchenList(request: express.Request): Promise<ISuccess | IError> {
     if (!request.query.pageindex) {
         request.query.pageindex = '1';
     }
     if (!request.query.pagesize) {
         request.query.pagesize = '20';
     }
-    return staffDao.getAllStaffs(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+    return kitchenDao.getAllKitchens(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
     .then(
         (response) => Promise.resolve({
-            message: 'Get staffs successfully.',
+            message: 'Get kitchens successfully.',
             data: {
-                staffs: response
+                kitchens: response
             }
         })
         )
@@ -253,11 +220,10 @@ function getStaffList(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-export const staffController = {
-    createStaff: createStaff,
-    // deleteStaff: deleteStaff
-    setActiveStaff: setActiveStaff,
-    getStaff: getStaff,
-    updateStaff: updateStaff,
-    getStaffList: getStaffList
+export const kitchenController = {
+    createKitchen: createKitchen,
+    setActiveKitchen: setActiveKitchen,
+    getKitchen: getKitchen,
+    updateKitchen: updateKitchen,
+    getKitchenList: getKitchenList
 };

@@ -1,11 +1,11 @@
 import * as express from 'express';
-import { tableController } from '../controllers';
+import { kitchenController } from '../controllers';
 import { parseJwt } from '../middlewares';
 
-export const tableRouter = express.Router();
+export const kitchenRouter = express.Router();
 
-tableRouter.route('/').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
-    tableController.getTable(req)
+kitchenRouter.route('/').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
+    kitchenController.getKitchen(req)
         .then(
         (response) => {
             res.send(response);
@@ -20,8 +20,8 @@ tableRouter.route('/').get((req: express.Request, res: express.Response, next: e
         );
 });
 
-tableRouter.route('/').post(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    tableController.createTable(req)
+kitchenRouter.route('/').post(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    kitchenController.createKitchen(req)
         .then(
         (response) => {
             res.send(response);
@@ -36,8 +36,8 @@ tableRouter.route('/').post(parseJwt('admin'), (req: express.Request, res: expre
         );
 });
 
-tableRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    tableController.setActiveTable(req)
+kitchenRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    kitchenController.setActiveKitchen(req)
         .then(
         response => {
             res.send(response);
@@ -52,8 +52,8 @@ tableRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, re
         );
 });
 
-tableRouter.route('/').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    tableController.updateTable(req)
+kitchenRouter.route('/').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    kitchenController.updateKitchen(req)
         .then(
         response => {
             res.send(response);
@@ -68,8 +68,8 @@ tableRouter.route('/').put(parseJwt('admin'), (req: express.Request, res: expres
         );
 });
 
-tableRouter.route('/getAll').get(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    tableController.getTableList(req)
+kitchenRouter.route('/getAll').get(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    kitchenController.getKitchenList(req)
         .then(
         response => {
             res.send(response);
@@ -84,8 +84,8 @@ tableRouter.route('/getAll').get(parseJwt('admin'), (req: express.Request, res: 
         );
 });
 
-// tableRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
-//     tableController.deleteTable(req)
+// kitchenRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
+//     kitchenController.deleteKitchen(req)
 //         .then(
 //         response => {
 //             res.send(response);

@@ -1,26 +1,26 @@
-import { TableModel, ITable, ITableModel } from '../models';
+import { KitchenModel, IKitchen, IKitchenModel } from '../models';
 import { paginate } from '../shared';
 
-function convertToResponseObject(table) {
+function convertToResponseObject(kitchen) {
     return {
-        name: table.name,
-        lowercaseName: table.lowercaseName,
-        username: table.userId.username,
-        id: table.id,
-        role: table.role,
-        active: table.active
+        name: kitchen.name,
+        lowercaseName: kitchen.lowercaseName,
+        username: kitchen.userId.username,
+        id: kitchen.id,
+        role: kitchen.role,
+        active: kitchen.active
     };
 }
 
-function getPopulatedTableById(tableId: string): Promise<any> {
-    return TableModel.findOne({ _id: tableId })
+function getPopulatedKitchenById(kitchenId: string): Promise<any> {
+    return KitchenModel.findOne({ _id: kitchenId })
         .then(
-        (responsedTable) => {
-            if (responsedTable) {
-                return responsedTable.populate('userId').execPopulate()
+        (responsedKitchen) => {
+            if (responsedKitchen) {
+                return responsedKitchen.populate('userId').execPopulate()
                     .then(
-                    (populatedTable: ITable) => {
-                        return Promise.resolve(convertToResponseObject(populatedTable));
+                    (populatedKitchen: IKitchen) => {
+                        return Promise.resolve(convertToResponseObject(populatedKitchen));
                     }
                     )
                     .catch(
@@ -53,15 +53,15 @@ function getPopulatedTableById(tableId: string): Promise<any> {
         );
 }
 
-function getPopulatedTableByUserId(userId: string): Promise<any> {
-    return TableModel.findOne({ userId: userId })
+function getPopulatedKitchenByUserId(userId: string): Promise<any> {
+    return KitchenModel.findOne({ userId: userId })
         .then(
-        (responsedTable) => {
-            if (responsedTable) {
-                return responsedTable.populate('userId').execPopulate()
+        (responsedKitchen) => {
+            if (responsedKitchen) {
+                return responsedKitchen.populate('userId').execPopulate()
                     .then(
-                    (populatedTable: ITable) => {
-                        return Promise.resolve(convertToResponseObject(populatedTable));
+                    (populatedKitchen: IKitchen) => {
+                        return Promise.resolve(convertToResponseObject(populatedKitchen));
                     }
                     )
                     .catch(
@@ -94,16 +94,16 @@ function getPopulatedTableByUserId(userId: string): Promise<any> {
         );
 }
 
-function getOriginTable(tableId: string): Promise<any> {
-    return TableModel.findOne({ _id: tableId })
+function getOriginKitchen(kitchenId: string): Promise<any> {
+    return KitchenModel.findOne({ _id: kitchenId })
         .then(
-        (responsedTable) => {
-            if (responsedTable) {
-                return Promise.resolve(responsedTable);
+        (responsedKitchen) => {
+            if (responsedKitchen) {
+                return Promise.resolve(responsedKitchen);
             } else {
                 return Promise.reject({
                     statusCode: 400,
-                    message: 'Table not found.'
+                    message: 'Kitchen not found.'
                 });
             }
         }
@@ -122,19 +122,19 @@ function getOriginTable(tableId: string): Promise<any> {
         );
 }
 
-function insertTable(table: ITable): Promise<any> {
-    return TableModel.findOne({ name: table.name })
+function insertKitchen(kitchen: IKitchen): Promise<any> {
+    return KitchenModel.findOne({ name: kitchen.name })
         .then(
-        (existedTable) => {
-            if (!existedTable) {
-                const newTable = new TableModel(table);
-                return newTable.save()
+        (existedKitchen) => {
+            if (!existedKitchen) {
+                const newKitchen = new KitchenModel(kitchen);
+                return newKitchen.save()
                     .then(
-                    (responsedTable) => {
-                        return responsedTable.populate('userId').execPopulate()
+                    (responsedKitchen) => {
+                        return responsedKitchen.populate('userId').execPopulate()
                             .then(
-                            (populatedTable: ITable) => {
-                                return Promise.resolve(convertToResponseObject(populatedTable));
+                            (populatedKitchen: IKitchen) => {
+                                return Promise.resolve(convertToResponseObject(populatedKitchen));
                             }
                             )
                             .catch(
@@ -158,7 +158,7 @@ function insertTable(table: ITable): Promise<any> {
             } else {
                 return Promise.reject({
                     statusCode: 400,
-                    message: 'Duplicate table name.'
+                    message: 'Duplicate kitchen name.'
                 });
             }
         }
@@ -177,13 +177,13 @@ function insertTable(table: ITable): Promise<any> {
         );
 }
 
-function removeTable(staffId: string): Promise<any> {
-    return TableModel.findOne({ _id: staffId })
+function removeKitchen(staffId: string): Promise<any> {
+    return KitchenModel.findOne({ _id: staffId })
         .then(
-        (responsedTable: ITableModel) => {
-            responsedTable.remove()
+        (responsedKitchen: IKitchenModel) => {
+            responsedKitchen.remove()
                 .then(
-                () => Promise.resolve('Remove table successfully.')
+                () => Promise.resolve('Remove kitchen successfully.')
                 )
                 .catch(
                 () => Promise.reject({
@@ -201,19 +201,19 @@ function removeTable(staffId: string): Promise<any> {
         );
 }
 
-function updateTable(table: ITable): Promise<any> {
-    return TableModel.findOne({ _id: table.id })
+function updateKitchen(kitchen: IKitchen): Promise<any> {
+    return KitchenModel.findOne({ _id: kitchen.id })
         .then(
-        (responsedTable) => {
-            responsedTable.name = table.name;
-            responsedTable.active = table.active;
-            return responsedTable.save()
+        (responsedKitchen) => {
+            responsedKitchen.name = kitchen.name;
+            responsedKitchen.active = kitchen.active;
+            return responsedKitchen.save()
                 .then(
-                updatedTable => {
-                    return updatedTable.populate('userId').execPopulate()
+                updatedKitchen => {
+                    return updatedKitchen.populate('userId').execPopulate()
                         .then(
-                        (populatedTable: ITable) => {
-                            return Promise.resolve(convertToResponseObject(populatedTable));
+                        (populatedKitchen: IKitchen) => {
+                            return Promise.resolve(convertToResponseObject(populatedKitchen));
                         }
                         )
                         .catch(
@@ -246,17 +246,17 @@ function updateTable(table: ITable): Promise<any> {
         );
 }
 
-function getAllTables(pageIndex: number, pageSize: number): Promise<any> {
-    return TableModel.count({})
+function getAllKitchens(pageIndex: number, pageSize: number): Promise<any> {
+    return KitchenModel.count({})
         .then(
         (count: number) => {
-            return TableModel.find({}).sort({ name: -1 })
+            return KitchenModel.find({}).sort({ name: -1 })
                 .skip((pageIndex > 0) ? (pageIndex - 1) * pageSize : 0)
                 .limit(pageSize)
                 .populate('userId')
                 .then(
-                tables => {
-                    const response = paginate(tables, count, pageIndex, pageSize);
+                kitchens => {
+                    const response = paginate(kitchens, count, pageIndex, pageSize);
                     for (const i in response.items) {
                         if (response.items[i]) {
                             response.items[i] = convertToResponseObject(response.items[i]);
@@ -285,12 +285,12 @@ function getAllTables(pageIndex: number, pageSize: number): Promise<any> {
         );
 }
 
-export const tableDao = {
-    insertTable: insertTable,
-    removeTable: removeTable,
-    updateTable: updateTable,
-    getOriginTable: getOriginTable,
-    getPopulatedTableById: getPopulatedTableById,
-    getPopulatedTableByUserId: getPopulatedTableByUserId,
-    getAllTables: getAllTables
+export const kitchenDao = {
+    insertKitchen: insertKitchen,
+    removeKitchen: removeKitchen,
+    updateKitchen: updateKitchen,
+    getOriginKitchen: getOriginKitchen,
+    getPopulatedKitchenById: getPopulatedKitchenById,
+    getPopulatedKitchenByUserId: getPopulatedKitchenByUserId,
+    getAllKitchens: getAllKitchens
 };

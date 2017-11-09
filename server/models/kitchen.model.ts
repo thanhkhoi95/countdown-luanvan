@@ -1,16 +1,17 @@
 import * as mongoose from 'mongoose';
 import * as diacritics from 'diacritics';
 
-export interface ICategory {
+export interface IKitchen {
     id?: string;
     name: string;
     lowercaseName?: string;
+    userId: string;
     active: boolean;
 }
 
-export interface ICategoryModel extends ICategory, mongoose.Document { }
+export interface IKitchenModel extends IKitchen, mongoose.Document { }
 
-const categorySchema = new mongoose.Schema(
+const kitchenSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -18,7 +19,13 @@ const categorySchema = new mongoose.Schema(
             unique: true
         },
         lowercaseName: {
-            type: String,
+            type: String
+        },
+        userId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user',
+            required: true,
+            unique: true
         },
         active: {
             type: Boolean,
@@ -37,13 +44,17 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Duplicate the ID field.
-categorySchema.virtual('id').get(function () {
+kitchenSchema.virtual('id').get(function () {
     return this._id.toHexString();
 });
 
-categorySchema.pre('save', function(next){
+kitchenSchema.pre('remove', function(next) {
+    this.model('user').remove({ _id: this.userId }, next);
+});
+
+kitchenSchema.pre('save', function(next){
     this.lowercaseName = diacritics.remove(this.name.toLowerCase());
     next();
 });
 
-export const CategoryModel = mongoose.model<ICategoryModel>('category', categorySchema);
+export const KitchenModel = mongoose.model<IKitchenModel>('kitchen', kitchenSchema);
