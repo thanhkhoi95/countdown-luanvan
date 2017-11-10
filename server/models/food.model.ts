@@ -1,4 +1,5 @@
 import * as mongoose from 'mongoose';
+import * as diacritics from 'diacritics';
 
 interface CategoryRef {
     categoryId: string;
@@ -7,6 +8,7 @@ interface CategoryRef {
 export interface IFood {
     id?: string;
     name: string;
+    lowercaseName?: string;
     description: string;
     price: number;
     pictures: string[];
@@ -21,6 +23,9 @@ const foodSchema = new mongoose.Schema(
         name: {
             type: String,
             required: true
+        },
+        lowercaseName: {
+            type: String
         },
         descripttion: {
             type: String,
@@ -56,6 +61,11 @@ const foodSchema = new mongoose.Schema(
 // Duplicate the ID field.
 foodSchema.virtual('id').get(function () {
     return this._id.toHexString();
+});
+
+foodSchema.pre('save', function(next){
+    this.lowercaseName = diacritics.remove(this.name.toLowerCase());
+    next();
 });
 
 export const FoodModel = mongoose.model<IFoodModel>('food', foodSchema);

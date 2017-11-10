@@ -5,7 +5,15 @@ import * as morgan from 'morgan';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
 
-import { userRouter, staffRouter, authRouter, tableRouter, kitchenRouter, categoryRouter } from './routes';
+import {
+    userRouter,
+    staffRouter,
+    authRouter,
+    tableRouter,
+    kitchenRouter,
+    categoryRouter,
+    foodRouter
+} from './routes';
 
 const app = express();
 dotenv.load({ path: '.env' });
@@ -58,6 +66,7 @@ db.once('open', () => {
     app.use(`${app.get('baseUri')}/table`, tableRouter);
     app.use(`${app.get('baseUri')}/kitchen`, kitchenRouter);
     app.use(`${app.get('baseUri')}/category`, categoryRouter);
+    app.use(`${app.get('baseUri')}/food`, foodRouter);
 
 
     // app.get('/*', function(req, res) {

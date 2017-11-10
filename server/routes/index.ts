@@ -4,3 +4,4 @@ export * from './auth.route';
 export * from './table.route';
 export * from './kitchen.route';
 export * from './category.route';
+export * from './food.route';
