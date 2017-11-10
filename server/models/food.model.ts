@@ -9,6 +9,7 @@ export interface IFood {
     id?: string;
     name: string;
     lowercaseName?: string;
+    avatar?: string;
     description: string;
     price: number;
     pictures: string[];
@@ -25,6 +26,9 @@ const foodSchema = new mongoose.Schema(
             required: true
         },
         lowercaseName: {
+            type: String
+        },
+        avatar: {
             type: String
         },
         descripttion: {
