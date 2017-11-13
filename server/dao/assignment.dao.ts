@@ -9,7 +9,31 @@ function convertToResponseObject(assignment) {
     };
 }
 
-function getAssignmentById(assignmentId): Promise<any> {
+function getOriginAssignment(assignmentId: string): Promise<any> {
+    return AssignmentModel.findOne({ _id: assignmentId })
+        .then((responsedAssignment) => {
+            if (responsedAssignment) {
+                return Promise.resolve(responsedAssignment);
+            } else {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'Assignment not found.'
+                });
+            }
+        })
+        .catch((error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        });
+}
+
+function getAssignmentById(assignmentId: string): Promise<any> {
     return AssignmentModel.findOne({ _id: assignmentId })
         .then((responsedAssignment) => {
             if (responsedAssignment) {
@@ -188,5 +212,6 @@ export const assignmentDao = {
     getAssignmentListByStaffId: getAssignmentListByStaffId,
     getAssignmentListByTableId: getAssignmentListByTableId,
     updateAssignment: updateAssignment,
-    deleteAssignment: deleteAssignment
+    deleteAssignment: deleteAssignment,
+    getOriginAssignment: getOriginAssignment
 };
