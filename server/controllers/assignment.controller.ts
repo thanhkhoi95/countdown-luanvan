@@ -135,10 +135,57 @@ function getAssignmentListByStaffId(request: express.Request): Promise<ISuccess 
         );
 }
 
+function getAssignmentListByTableId(request: express.Request): Promise<ISuccess | IError> {
+    return assignmentDao.getAssignmentListByTableId(request.query.staffId)
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get assignments successfully.',
+            data: {
+                assignments: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function deleteAssignment(request: express.Request): Promise<ISuccess | IError> {
+    return assignmentDao.deleteAssignment(request.query.id)
+        .then(
+        () => Promise.resolve({
+            message: 'Delete assignment successfully.',
+            data: {}
+        })
+        )
+        .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
 export const assignmentController = {
     createAssignment: createAssignment,
-    setActiveAssignment: setActiveAssignment,
-    getAssignment: getAssignment,
+    getAssignmentById: getAssignmentById,
     updateAssignment: updateAssignment,
-    getAssignmentList: getAssignmentList
+    getAssignmentListByStaffId: getAssignmentListByStaffId,
+    getAssignmentListByTableId: getAssignmentListByTableId,
+    deleteAssignment: deleteAssignment
 };

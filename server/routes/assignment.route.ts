@@ -38,10 +38,10 @@ assignmentRouter.route('/').put(
     }
 );
 
-assignmentRouter.route('/getAll').get(
+assignmentRouter.route('/staff').get(
     parseJwt('admin'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        assignmentController.getAssignmentList(req)
+        assignmentController.getAssignmentListByStaffId(req)
             .then(
             response => {
                 res.send(response);
@@ -57,7 +57,28 @@ assignmentRouter.route('/getAll').get(
     }
 );
 
-assignmentRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
+assignmentRouter.route('/table').get(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        assignmentController.getAssignmentListByTableId(req)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
+assignmentRouter.route('/').delete(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     assignmentController.deleteAssignment(req)
         .then(
         response => {
@@ -72,4 +93,3 @@ assignmentRouter.route('/').delete((req: express.Request, res: express.Response,
         }
         );
 });
-
