@@ -6,7 +6,7 @@ import { ICategory } from '../models';
 function createCategory(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.name) {
         return Promise.reject({
-            statusCode: 404,
+            statusCode: 400,
             message: 'Data fields missing.'
         });
     }
@@ -20,7 +20,7 @@ function createCategory(request: express.Request): Promise<ISuccess | IError> {
             return Promise.resolve({
                 message: 'Create new category successfully.',
                 data: {
-                    staff: responsedCategory
+                    category: responsedCategory
                 }
             });
         }
@@ -93,7 +93,7 @@ function getCategory(request: express.Request): Promise<ISuccess | IError> {
         (response) => Promise.resolve({
             message: 'Get category successfully.',
             data: {
-                table: response
+                category: response
             }
         })
         )

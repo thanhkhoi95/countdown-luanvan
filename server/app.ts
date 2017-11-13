@@ -12,7 +12,8 @@ import {
     tableRouter,
     kitchenRouter,
     categoryRouter,
-    foodRouter
+    foodRouter,
+    assignmentRouter
 } from './routes';
 
 const app = express();
@@ -67,6 +68,7 @@ db.once('open', () => {
     app.use(`${app.get('baseUri')}/kitchen`, kitchenRouter);
     app.use(`${app.get('baseUri')}/category`, categoryRouter);
     app.use(`${app.get('baseUri')}/food`, foodRouter);
+    app.use(`${app.get('baseUri')}/assignment`, assignmentRouter);
 
 
     // app.get('/*', function(req, res) {

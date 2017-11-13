@@ -1,7 +1,7 @@
 import { TableModel, ITable, ITableModel } from '../models';
 import { paginate } from '../shared';
 
-function convertToResponseObject(table) {
+export function convertTableToResponseObject(table) {
     return {
         name: table.name,
         lowercaseName: table.lowercaseName,
@@ -20,7 +20,7 @@ function getPopulatedTableById(tableId: string): Promise<any> {
                 return responsedTable.populate('userId').execPopulate()
                     .then(
                     (populatedTable: ITable) => {
-                        return Promise.resolve(convertToResponseObject(populatedTable));
+                        return Promise.resolve(convertTableToResponseObject(populatedTable));
                     }
                     )
                     .catch(
@@ -61,7 +61,7 @@ function getPopulatedTableByUserId(userId: string): Promise<any> {
                 return responsedTable.populate('userId').execPopulate()
                     .then(
                     (populatedTable: ITable) => {
-                        return Promise.resolve(convertToResponseObject(populatedTable));
+                        return Promise.resolve(convertTableToResponseObject(populatedTable));
                     }
                     )
                     .catch(
@@ -134,7 +134,7 @@ function insertTable(table: ITable): Promise<any> {
                         return responsedTable.populate('userId').execPopulate()
                             .then(
                             (populatedTable: ITable) => {
-                                return Promise.resolve(convertToResponseObject(populatedTable));
+                                return Promise.resolve(convertTableToResponseObject(populatedTable));
                             }
                             )
                             .catch(
@@ -213,7 +213,7 @@ function updateTable(table: ITable): Promise<any> {
                     return updatedTable.populate('userId').execPopulate()
                         .then(
                         (populatedTable: ITable) => {
-                            return Promise.resolve(convertToResponseObject(populatedTable));
+                            return Promise.resolve(convertTableToResponseObject(populatedTable));
                         }
                         )
                         .catch(
@@ -259,7 +259,7 @@ function getAllTables(pageIndex: number, pageSize: number): Promise<any> {
                     const response = paginate(tables, count, pageIndex, pageSize);
                     for (const i in response.items) {
                         if (response.items[i]) {
-                            response.items[i] = convertToResponseObject(response.items[i]);
+                            response.items[i] = convertTableToResponseObject(response.items[i]);
                         }
                     }
                     return Promise.resolve(response);

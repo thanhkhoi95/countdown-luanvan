@@ -9,3 +9,4 @@ export * from './auth.controller';
 export * from './kitchen.controller';
 export * from './category.controller';
 export * from './food.controller';
+export * from './assignment.controller';

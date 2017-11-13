@@ -9,7 +9,7 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
         !request.body.firstname || !request.body.lastname ||
         !request.body.birthdate || !request.body.gender) {
         return Promise.reject({
-            statusCode: 404,
+            statusCode: 400,
             message: 'Data fields missing.'
         });
     }

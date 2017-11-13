@@ -4,7 +4,8 @@ import { parseJwt } from '../middlewares';
 
 export const kitchenRouter = express.Router();
 
-kitchenRouter.route('/').get((req: express.Request, res: express.Response, next: express.NextFunction) => {
+kitchenRouter.route('/').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     kitchenController.getKitchen(req)
         .then(
         (response) => {
@@ -18,9 +19,12 @@ kitchenRouter.route('/').get((req: express.Request, res: express.Response, next:
             });
         }
         );
-});
+}
+);
 
-kitchenRouter.route('/').post(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+kitchenRouter.route('/').post(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     kitchenController.createKitchen(req)
         .then(
         (response) => {
@@ -34,9 +38,12 @@ kitchenRouter.route('/').post(parseJwt('admin'), (req: express.Request, res: exp
             });
         }
         );
-});
+}
+);
 
-kitchenRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+kitchenRouter.route('/setactive').put(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     kitchenController.setActiveKitchen(req)
         .then(
         response => {
@@ -50,9 +57,12 @@ kitchenRouter.route('/setactive').put(parseJwt('admin'), (req: express.Request, 
             });
         }
         );
-});
+}
+);
 
-kitchenRouter.route('/').put(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+kitchenRouter.route('/').put(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     kitchenController.updateKitchen(req)
         .then(
         response => {
@@ -66,9 +76,11 @@ kitchenRouter.route('/').put(parseJwt('admin'), (req: express.Request, res: expr
             });
         }
         );
-});
+}
+);
 
-kitchenRouter.route('/getAll').get(parseJwt('admin'), (req: express.Request, res: express.Response, next: express.NextFunction) => {
+kitchenRouter.route('/getAll').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
     kitchenController.getKitchenList(req)
         .then(
         response => {
@@ -82,7 +94,8 @@ kitchenRouter.route('/getAll').get(parseJwt('admin'), (req: express.Request, res
             });
         }
         );
-});
+}
+);
 
 // kitchenRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
 //     kitchenController.deleteKitchen(req)

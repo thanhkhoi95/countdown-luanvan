@@ -6,7 +6,7 @@ import { IUser, IUserModel, IKitchen } from '../models';
 function createKitchen(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.username || !request.body.password || !request.body.name) {
         return Promise.reject({
-            statusCode: 404,
+            statusCode: 400,
             message: 'Data fields missing.'
         });
     }

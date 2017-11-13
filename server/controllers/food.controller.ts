@@ -8,7 +8,7 @@ function createFood(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.name || !request.body.description ||
         !request.body.price || !request.body.categories) {
         return Promise.reject({
-            statusCode: 404,
+            statusCode: 400,
             message: 'Data fields missing.'
         });
     }
@@ -33,7 +33,6 @@ function createFood(request: express.Request): Promise<ISuccess | IError> {
         )
         .catch(
         (error) => {
-            console.log(error);
             if (!error.statusCode) {
                 return Promise.reject({
                     statusCode: 500,
@@ -123,17 +122,26 @@ function getFood(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function updateFood(request: express.Request): Promise<ISuccess | IError> {
+    console.log(123);
     return foodDao.getOriginFood(request.query.id)
         .then(
         (responsedFood) => {
             if (request.body.gender === undefined) {
                 request.body.gender = responsedFood.gender;
             }
-            request.body.pictures = [...request.body.pictures, ...request.body.pictures];
+            if (request.body.pictrues && request.body.pictrues !== '') {
+                request.body.pictrues = request.body.pictures.split(',');
+            } else {
+                request.body.pictrues = [];
+            }
+            request.body.pictures = [...request.body.uploadedImages, ...request.body.pictures];
             for (const img of responsedFood.pictures) {
                 if (request.body.pictures.indexOf(img) < 0) {
                     rollbackUploadedFiles([img]);
                 }
+            }
+            if (request.body.categories) {
+                request.body.categories = request.body.categories.split(',');
             }
             const food: IFood = {
                 id: request.query.id,

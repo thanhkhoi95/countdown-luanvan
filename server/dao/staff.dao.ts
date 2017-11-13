@@ -1,7 +1,7 @@
 import { StaffModel, IStaff, IStaffModel } from '../models';
 import { paginate } from '../shared';
 
-function convertToResponseObject(staff) {
+export function convertStaffToResponseObject(staff) {
     return {
         firstname: staff.firstname,
         lowercaseFirstname: staff.lowercaseFirstname,
@@ -25,7 +25,7 @@ function getPopulatedStaffById(staffId: string): Promise<any> {
                 return responsedStaff.populate('userId').execPopulate()
                     .then(
                     (populatedStaff: IStaff) => {
-                        return Promise.resolve(convertToResponseObject(populatedStaff));
+                        return Promise.resolve(convertStaffToResponseObject(populatedStaff));
                     }
                     )
                     .catch(
@@ -66,7 +66,7 @@ function getPopulatedStaffByUserId(userId: string): Promise<any> {
                 return responsedStaff.populate('userId').execPopulate()
                     .then(
                     (populatedStaff: IStaff) => {
-                        return Promise.resolve(convertToResponseObject(populatedStaff));
+                        return Promise.resolve(convertStaffToResponseObject(populatedStaff));
                     }
                     )
                     .catch(
@@ -135,7 +135,7 @@ function insertStaff(staff: IStaff): Promise<any> {
             return responsedStaff.populate('userId').execPopulate()
                 .then(
                 (populatedStaff: IStaff) => {
-                    return Promise.resolve(convertToResponseObject(populatedStaff));
+                    return Promise.resolve(convertStaffToResponseObject(populatedStaff));
                 }
                 )
                 .catch(
@@ -198,7 +198,7 @@ function updateStaff(staff: IStaff): Promise<any> {
                     return updatedStaff.populate('userId').execPopulate()
                         .then(
                         (populatedStaff: IStaff) => {
-                            return Promise.resolve(convertToResponseObject(populatedStaff));
+                            return Promise.resolve(convertStaffToResponseObject(populatedStaff));
                         }
                         )
                         .catch(
@@ -244,7 +244,7 @@ function getAllStaffs(pageIndex: number, pageSize: number): Promise<any> {
                     const response = paginate(staffs, count, pageIndex, pageSize);
                     for (const i in response.items) {
                         if (response.items[i]) {
-                            response.items[i] = convertToResponseObject(response.items[i]);
+                            response.items[i] = convertStaffToResponseObject(response.items[i]);
                         }
                     }
                     return Promise.resolve(response);

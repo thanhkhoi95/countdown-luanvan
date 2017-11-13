@@ -28,7 +28,6 @@ export function uploadImage(req, res: express.Response, next: express.NextFuncti
                 res.status(500).send({
                     message: 'Upload image error.'
                 });
-                console.log(error);
                 flag = false;
                 break;
             }
