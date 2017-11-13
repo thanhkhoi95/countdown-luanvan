@@ -120,8 +120,73 @@ function insertAssignment(assignment: IAssignment): Promise<any> {
         });
 }
 
+function updateAssignment(assignment: IAssignment): Promise<any> {
+    return AssignmentModel.findOne({ _id: assignment.id })
+        .then(
+        (responsedAssignment) => {
+            responsedAssignment.staffId = assignment.staffId;
+            responsedAssignment.tableId = assignment.tableId;
+            return responsedAssignment.save()
+                .then(
+                updatedAssignment => {
+                    return updatedAssignment.populate('staffId').populate('tableId').execPopulate()
+                        .then(
+                        (populatedAssignment: IAssignment) => {
+                            return Promise.resolve(convertToResponseObject(populatedAssignment));
+                        }
+                        )
+                        .catch(
+                        error => {
+                            return Promise.reject({
+                                statusCode: 500,
+                                message: 'Internal server error.'
+                            });
+                        }
+                        );
+                }
+                )
+                .catch(
+                error => {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                }
+                );
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
 
+function deleteAssignment(assignmentId: string): Promise<any> {
+    return AssignmentModel.findOneAndRemove({ _id: assignmentId })
+        .then(
+        () => {
+            return Promise.resolve({});
+        }
+        )
+        .catch(
+        () => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
 
 export const assignmentDao = {
-    insertAssignment: insertAssignment
+    insertAssignment: insertAssignment,
+    getAssignmentById: getAssignmentById,
+    getAssignmentListByStaffId: getAssignmentListByStaffId,
+    getAssignmentListByTableId: getAssignmentListByTableId,
+    updateAssignment: updateAssignment,
+    deleteAssignment: deleteAssignment
 };
