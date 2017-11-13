@@ -9,8 +9,9 @@ function convertToResponseObject(staff) {
         lowercaseLastname: staff.lowercaseLastname,
         birthdate: staff.birthdate,
         gender: staff.gender ? 'male' : 'female',
+        avatar: staff.avatar,
         username: staff.userId.username,
-        id: staff.id,
+        id: staff.id || '',
         role: staff.role,
         active: staff.active
     };
@@ -190,6 +191,7 @@ function updateStaff(staff: IStaff): Promise<any> {
             responsedStaff.gender = staff.gender;
             responsedStaff.active = staff.active;
             responsedStaff.birthdate = staff.birthdate;
+            responsedStaff.avatar = staff.avatar;
             return responsedStaff.save()
                 .then(
                 updatedStaff => {

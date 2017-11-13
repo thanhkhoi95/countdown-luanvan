@@ -2,6 +2,7 @@ import * as express from 'express';
 import { IError, ISuccess, cryptoUtils } from '../shared';
 import { userDao, staffDao } from '../dao';
 import { IUser, IUserModel, IStaff } from '../models';
+import { rollbackUploadedFiles } from '../middlewares';
 
 function createStaff(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.username || !request.body.password ||
@@ -30,6 +31,9 @@ function createStaff(request: express.Request): Promise<ISuccess | IError> {
                 userId: responsedUser.id,
                 active: true
             };
+            if (request.body.uploadedImages.length > 0) {
+                newStaff.avatar = request.body.uploadedImages[0];
+            }
             return staffDao.insertStaff(newStaff)
                 .then(
                 (responsedStaff) => {
@@ -168,6 +172,70 @@ function getStaff(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
+function updateAvatar(request: express.Request): Promise<ISuccess | IError> {
+    if (request.body.uploadedImages.length < 0) {
+        return Promise.reject({
+            statusCode: 400,
+            message: 'Invalid image.'
+        });
+    }
+    return staffDao.getOriginStaff(request.query.id)
+        .then(
+        (responsedStaff) => {
+            if (request.body.gender === undefined) {
+                request.body.gender = responsedStaff.gender;
+            }
+            const oldAvatar = responsedStaff.avatar;
+            const staff: IStaff = {
+                id: request.query.id,
+                firstname: responsedStaff.firstname,
+                lastname: responsedStaff.lastname,
+                birthdate: responsedStaff.birthdate,
+                gender: responsedStaff.birthdate,
+                userId: responsedStaff.birthdate,
+                active: responsedStaff.birthdate,
+                avatar: request.body.uploadedImages[0]
+            };
+            return staffDao.updateStaff(staff)
+                .then(
+                (updatedStaff) => {
+                    rollbackUploadedFiles([oldAvatar]);
+                    return Promise.resolve({
+                        message: 'Update avatar successfully.',
+                        data: {
+                            staff: updatedStaff
+                        }
+                    });
+                }
+                )
+                .catch(
+                (error) => {
+                    if (!error.statusCode) {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    } else {
+                        return Promise.reject(error);
+                    }
+                }
+                );
+        }
+        )
+        .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
 function updateStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.getOriginStaff(request.query.id)
         .then(
@@ -182,7 +250,8 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
                 birthdate: request.body.birthdate || responsedStaff.birthdate,
                 gender: request.body.gender,
                 userId: responsedStaff.userId,
-                active: responsedStaff.active
+                active: responsedStaff.active,
+                avatar: responsedStaff.avatar
             };
             return staffDao.updateStaff(staff)
                 .then(
@@ -231,7 +300,7 @@ function getStaffList(request: express.Request): Promise<ISuccess | IError> {
         request.query.pagesize = '20';
     }
     return staffDao.getAllStaffs(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
-    .then(
+        .then(
         (response) => Promise.resolve({
             message: 'Get staffs successfully.',
             data: {
@@ -259,5 +328,6 @@ export const staffController = {
     setActiveStaff: setActiveStaff,
     getStaff: getStaff,
     updateStaff: updateStaff,
+    updateAvatar: updateAvatar,
     getStaffList: getStaffList
 };

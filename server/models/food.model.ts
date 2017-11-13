@@ -1,19 +1,14 @@
 import * as mongoose from 'mongoose';
 import * as diacritics from 'diacritics';
 
-interface CategoryRef {
-    categoryId: string;
-}
-
 export interface IFood {
     id?: string;
     name: string;
     lowercaseName?: string;
-    avatar?: string;
     description: string;
     price: number;
     pictures: string[];
-    categories: CategoryRef[];
+    categories: string[];
     active: boolean;
 }
 
@@ -28,10 +23,7 @@ const foodSchema = new mongoose.Schema(
         lowercaseName: {
             type: String
         },
-        avatar: {
-            type: String
-        },
-        descripttion: {
+        description: {
             type: String,
             required: true
         },
@@ -40,12 +32,7 @@ const foodSchema = new mongoose.Schema(
             required: true
         },
         pictures: [String],
-        categories: [{
-            categoryId: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'category'
-            }
-        }],
+        categories: [String],
         active: {
             type: Boolean,
             default: true,

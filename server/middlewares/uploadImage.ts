@@ -24,7 +24,7 @@ export function uploadImage(req, res: express.Response, next: express.NextFuncti
                 fs.writeFileSync(pathUpload, data);
                 req.body.uploadedImages.push(fileId);
             } catch (error) {
-                rollbackUploadedFiles(req.files);
+                rollbackUploadedFiles(req.body.uploadedImages);
                 res.status(500).send({
                     message: 'Upload image error.'
                 });
@@ -48,12 +48,12 @@ export function uploadImage(req, res: express.Response, next: express.NextFuncti
     }
 }
 
-function rollbackUploadedFiles(files) {
+export function rollbackUploadedFiles(files) {
     let fileId: string;
     let pathUpload: string;
     for (const fileName in files) {
         if (fileName) {
-            fileId = Date.now() + path.extname(files[fileName].name);
+            fileId = files[fileName];
             pathUpload = __dirname + '/../upload/' + fileId;
             try {
                 fs.unlinkSync(pathUpload);

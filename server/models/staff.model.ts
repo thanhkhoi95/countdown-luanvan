@@ -7,6 +7,7 @@ export interface IStaff {
     lowercaseFirstname?: string;
     lastname: string;
     lowercaseLastname?: string;
+    avatar?: string;
     birthdate: Date;
     userId: string;
     gender: boolean;
@@ -30,6 +31,9 @@ const staffSchema = new mongoose.Schema(
         lastname: {
             type: String,
             required: true
+        },
+        avatar: {
+            type: String
         },
         userId: {
             type: mongoose.Schema.Types.ObjectId,
