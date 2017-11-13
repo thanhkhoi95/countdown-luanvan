@@ -111,19 +111,13 @@ function updateAssignment(request: express.Request): Promise<ISuccess | IError> 
         );
 }
 
-function getAssignmentList(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.query.pageindex) {
-        request.query.pageindex = '1';
-    }
-    if (!request.query.pagesize) {
-        request.query.pagesize = '20';
-    }
-    return assignmentDao.getAllCategories(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+function getAssignmentListByStaffId(request: express.Request): Promise<ISuccess | IError> {
+    return assignmentDao.getAssignmentListByStaffId(request.query.staffId)
         .then(
         (response) => Promise.resolve({
-            message: 'Get categories successfully.',
+            message: 'Get assignments successfully.',
             data: {
-                categories: response
+                assignments: response
             }
         })
         )
