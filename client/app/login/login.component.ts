@@ -47,11 +47,9 @@ export class LoginComponent implements OnInit {
   login() {
     this.auth.login(this.loginForm.value).subscribe(
       res => {
-        console.log(res);
         return this.router.navigateByUrl('/home');
       },
       error => {
-        console.log(error);
         return this.toast.setMessage('Invalid username or password', 'danger');
       }
     );

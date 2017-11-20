@@ -43,8 +43,24 @@ export class FoodComponent implements OnInit {
             name: this.name,
             description: this.description,
             price: this.price,
-            category: this.category
-        });
+            category: this.category,
+            categories: this.category
+        }, { validator: this.checkPrice('price') });
+    }
+
+    checkPrice(price) {
+        return (group: FormGroup) => {
+            const priceInput = group.controls[price];
+            if (priceInput.value < 0) {
+                return priceInput.setErrors({ notValid: true });
+            } else {
+                return priceInput.setErrors(null);
+            }
+        };
+    }
+
+    validatePrice(value) {
+        value < 0 ? this.food['price'] = 0 : this.food['price'] = value;
     }
 
     getAllFoods() {
@@ -86,17 +102,18 @@ export class FoodComponent implements OnInit {
         );
     }
 
-    // addTable() {
-    //   this.tablesService.addTable(this.addTableForm.value).subscribe(
-    //     res => {
-    //       const newTable = res.data.table;
-    //       this.tables.push(newTable);
-    //       this.addTableForm.reset();
-    //       this.toast.setMessage('New table added successfully.', 'success');
-    //     },
-    //     error => console.log(error)
-    //   );
-    // }
+    addFood() {
+        this.foodService.addFood(this.addFoodForm.value).subscribe(
+            res => {
+                res.data.food.category = res.data.food.categories[0];
+                const newFood = res.data.food;
+                this.foods.push(newFood);
+                this.addFoodForm.reset();
+                this.toast.setMessage('Thêm món ăn mới thành công.', 'success');
+            },
+            error => console.log(error)
+        );
+    }
 
     enableEditing(food) {
         this.isEditing = true;
@@ -110,38 +127,29 @@ export class FoodComponent implements OnInit {
         this.getAllFoods();
     }
 
-    // parseDate(dateString: string): Date {
-    //     if (dateString) {
-    //         return new Date(dateString);
-    //     } else {
-    //         return null;
-    //     }
-    // }
+    deactiveFood(food) {
+        this.foodService.setActive(food, false).subscribe(
+            res => {
+                this.food = food;
+                food.active = false;
+                this.toast.setMessage('Món ăn đã được deactive', 'success');
+            },
+            error => console.log(error)
+        );
+    }
 
-    // deactiveStaff(staff) {
-    //     this.staffService.setActive(staff, false).subscribe(
-    //         res => {
-    //             this.staff = staff;
-    //             staff.active = false;
-    //             this.toast.setMessage('Nhân viên đã được deactive', 'success');
-    //         },
-    //         error => console.log(error)
-    //     );
-    // }
+    activeFood(food) {
+        this.foodService.setActive(food, true).subscribe(
+            res => {
+                this.food = food;
+                food.active = true;
+                this.toast.setMessage('Món ăn đã được active', 'success');
+            },
+            error => console.log(error)
+        );
+    }
 
-    // activeStaff(staff) {
-    //     this.staffService.setActive(staff, true).subscribe(
-    //         res => {
-    //             this.staff = staff;
-    //             staff.active = true;
-    //             this.toast.setMessage('Nhân viên đã được active', 'success');
-    //         },
-    //         error => console.log(error)
-    //     );
-    // }
-
-    // addStaff() {
-    //     console.log(this.addStaffForm.value);
+    // addFood() {
     //     const newStaff = this.addStaffForm.value;
     //     const formData = new FormData();
     //     formData.append('firstname', newStaff.firstname);
@@ -159,19 +167,22 @@ export class FoodComponent implements OnInit {
     //     );
     // }
 
-    // updateStaff(staff) {
-    //     staff.gender = staff.gender === 'Nam' ? 'true' : 'false';
-    //     console.log(staff);
-    //     this.staffService.updateStaff(staff).subscribe(
-    //         res => {
-    //             this.isEditing = false;
-    //             staff.gender = staff.gender === 'true' ? 'Nam' : 'Nữ';
-    //             this.staff = staff;
-    //             this.toast.setMessage('Chỉnh sửa thông tin nhân viên thành công', 'success');
-    //         },
-    //         error => console.log(error)
-    //     );
-    // }
-
+    updateFood(food) {
+        const formData = new FormData();
+        formData.append('name', food.name);
+        formData.append('description', food.description);
+        formData.append('price', food.price);
+        formData.append('categories', food.category);
+        formData.append('pictures', food.pictures[0]);
+        this.foodService.updateFood(food, formData).subscribe(
+            res => {
+                this.isEditing = false;
+                res.data.food.category = res.data.food.categories[0].id;
+                this.food = res.data.food;
+                this.toast.setMessage('Chỉnh sửa thông tin món ăn thành công', 'success');
+            },
+            error => console.log(error)
+        );
+    }
 
 }

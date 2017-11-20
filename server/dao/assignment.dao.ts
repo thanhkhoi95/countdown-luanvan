@@ -4,6 +4,7 @@ import { paginate } from '../shared';
 
 function convertToResponseObject(assignment) {
     return {
+        id: assignment.id,
         staff: convertStaff(assignment.staffId),
         table: convertTable(assignment.tableId)
     };
@@ -67,10 +68,12 @@ function getAssignmentById(assignmentId: string): Promise<any> {
 }
 
 function getAssignmentListByStaffId(staffId: string): Promise<any> {
+    console.log(staffId);
     return AssignmentModel.find({ staffId: staffId })
         .populate('staffId').populate('tableId')
         .then(
         assignments => {
+            console.log(assignments);
             const data = [];
             for (const i in assignments) {
                 if (assignments[i]) {

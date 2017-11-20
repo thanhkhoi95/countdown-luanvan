@@ -36,9 +36,9 @@
             <input class="inputfile" name="picture" id="picture" type="file" accept=".jpg,.png" (change)="changePicture($event, food);">
             <label class="btn btn-sm btn-warning " for="picture">
               <i class="fa fa-picture-o"></i> Change picture</label>
-            <button *ngIf="!food.active" class="btn btn-sm btn-primary" (click)="activeStaff(food)">
+            <button *ngIf="!food.active" class="btn btn-sm btn-primary" (click)="activeFood(food)">
               <i class="fa fa-trash"></i> Active</button>
-            <button *ngIf="food.active" class="btn btn-sm btn-danger" (click)="deactiveStaff(food)">
+            <button *ngIf="food.active" class="btn btn-sm btn-danger" (click)="deactiveFood(food)">
               <i class="fa fa-trash"></i> Deactive</button>
           </td>
         </tr>
@@ -59,6 +59,12 @@
           </div>
           <div class="form-group edit-input">
             <label>
+              <b>Giá: </b>
+            </label>
+            <input class="form-control" type="number" min="0" name="price" [ngModel]="food.price" (ngModelChange)="validatePrice($event)" placeholder="Giá" required>
+          </div>
+          <div class="form-group edit-input">
+            <label>
               <b>Danh mục: </b>
             </label>
             <select class="form-control" name="category" [(ngModel)]="food.category">
@@ -75,48 +81,32 @@
     </table>
   </div>
 </div>
-<!-- 
+
 <div class="card" *ngIf="!isEditing">
   <h4 class="card-header">Thêm nhân viên mới</h4>
   <div class="card-block">
-    <form class="form-inline" [formGroup]="addStaffForm" (ngSubmit)="addStaff()" style="text-align:center">
+    <form class="form-inline" [formGroup]="addFoodForm" (ngSubmit)="addFood()" style="text-align:center">
       <div class="form-group edit-input">
-        <b>Họ: </b>
-        <input class="form-control" type="text" name="lastname" formControlName="lastname" placeholder="Họ">
+        <b>Tên món ăn: </b>
+        <input class="form-control" type="text" name="name" formControlName="name" placeholder="Tên món ăn">
       </div>
       <div class="form-group edit-input">
-        <b>Tên: </b>
-        <input class="form-control" type="text" name="firstname" formControlName="firstname" placeholder="Tên">
+        <b>Mô tả: </b>
+        <textarea class="form-control" rows="3" name="description" formControlName="description" placeholder="Mô tả"></textarea>
       </div>
       <div class="form-group edit-input">
-        <b>Giới tính: </b>
-        <select class="form-control" name="gender" formControlName="gender">
-          <option value="" disabled selected>Giới tính</option>
-          <option value="Nu" selected>Nữ</option>
-          <option value="Nam">Nam</option>
+        <b>Giá: </b>
+        <input class="form-control" type="number" min="0" name="price" formControlName="price" placeholder="Giá">
+      </div>
+      <div class="form-group edit-input">
+          <b>Danh mục: </b>
+        <select class="form-control" name="category" formControlName="category">
+          <option *ngFor="let category of categories" [ngValue]="category.id">{{category.name}}</option>
         </select>
       </div>
-      <div class="form-group edit-input">
-        <b>Ngày sinh: </b>
-        <input class="form-control" type="date" name="birthdate" formControlName="birthdate">
-      </div>
-      <div class="form-group edit-input">
-        <b>Tên đăng nhập: </b>
-        <input class="form-control" type="text" name="username" formControlName="username" placeholder="Tên đăng nhập" min="0" required>
-      </div>
-      <div class="form-group edit-input">
-        <b>Mật khẩu: </b>
-        <input class="form-control" type="password" name="password" formControlName="password" placeholder="Mật khẩu" step="any"
-          min="0" required>
-      </div>
-      <div class="form-group edit-input">
-        <b>Nhập lại mật khẩu: </b>
-        <input class="form-control" type="password" name="passwordConfirm" formControlName="passwordConfirm" placeholder="Nhập lại mật khẩu"
-          step="any" min="0" required>
-      </div>
       <br>
-      <button class="btn btn-primary  edit-input" type="submit" [disabled]="!addStaffForm.valid">
+      <button class="btn btn-primary  edit-input" type="submit" [disabled]="!addFoodForm.valid">
         <i class="fa fa-floppy-o"></i> Add</button>
     </form>
   </div>
-</div> -->
+</div>

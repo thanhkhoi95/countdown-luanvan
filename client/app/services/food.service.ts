@@ -27,20 +27,24 @@ export class FoodService {
         return this.http.put('/api/food?id=' + food.id, formData, { headers: headers });
     }
 
-    // setActive(staff, flag): Observable<any> {
-    //     return this.http.put(`/api/staff/setactive?id=${staff.id}&state=${flag}`, {}, this.options);
-    // }
+    setActive(food, flag): Observable<any> {
+        return this.http.put(`/api/food/setactive?id=${food.id}&state=${flag}`, {}, this.options);
+    }
 
-    // addStaff(formData): Observable<any> {
+    addFood(formData): Observable<any> {
 
-    //     const headers = new HttpHeaders({
-    //         'x-access-token': localStorage.getItem('token')
-    //     });
+        const headers = new HttpHeaders({
+            'x-access-token': localStorage.getItem('token')
+        });
 
-    //     return this.http.post('/api/staff', formData, { headers: headers });
-    // }
+        return this.http.post('/api/food', formData, { headers: headers });
+    }
 
-    // updateStaff(staff): Observable<any> {
-    //     return this.http.put(`/api/staff?id=${staff.id}`, staff, this.options);
-    // }
+    updateFood(food, formData): Observable<any> {
+        const headers = new HttpHeaders({
+            'x-access-token': localStorage.getItem('token')
+        });
+
+        return this.http.put('/api/food?id=' + food.id, formData, { headers: headers });
+    }
 }

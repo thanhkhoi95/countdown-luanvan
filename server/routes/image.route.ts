@@ -10,7 +10,7 @@ imageRouter.route('/:filename').get(
         if (fs.existsSync(filePath)) {
             res.sendFile(path.resolve(filePath));
         } else {
-            res.sendFile(path.resolve(__dirname + '/../upload/defaultStaff.png'));
+            res.sendFile(path.resolve(__dirname + '/../upload/default.png'));
         }
     }
 );

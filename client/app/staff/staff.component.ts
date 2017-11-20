@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
 
 import { StaffService } from '../services/staff.service';
+import { TableService } from '../services/table.service';
+import { AssignmentService } from '../services/assignment.service';
+
 import { ToastComponent } from '../shared/toast/toast.component';
 
 import * as moment from 'moment';
@@ -15,10 +18,14 @@ export class StaffComponent implements OnInit {
 
     staff = {};
     staffs = [];
+    tables = [];
+    assignments = [];
     isLoading = true;
     isEditing = false;
+    isAssigning = false;
 
     addStaffForm: FormGroup;
+    addAssignmentForm: FormGroup;
     firstname = new FormControl('', Validators.required);
     lastname = new FormControl('', Validators.required);
     birthdate = new FormControl('', Validators.required);
@@ -26,8 +33,11 @@ export class StaffComponent implements OnInit {
     username = new FormControl('', Validators.required);
     password = new FormControl('', Validators.required);
     passwordConfirm = new FormControl('', Validators.required);
+    tableA = new FormControl('', Validators.required);
 
     constructor(private staffService: StaffService,
+        private assignmentService: AssignmentService,
+        private tableService: TableService,
         private formBuilder: FormBuilder,
         public toast: ToastComponent) { }
 
@@ -42,6 +52,89 @@ export class StaffComponent implements OnInit {
             password: this.password,
             passwordConfirm: this.passwordConfirm
         }, { validator: this.checkIfMatchingPasswords('password', 'passwordConfirm') });
+        this.addAssignmentForm = this.formBuilder.group({
+            table: this.tableA
+        });
+    }
+
+    cancelAddAssignment() {
+        this.isAssigning = false;
+        this.staff = {};
+        this.addAssignmentForm.reset();
+        this.getAllStaffs();
+    }
+
+    addAssignment() {
+        const newAssignment = {
+            staffId: this.staff['id'],
+            tableId: this.addAssignmentForm.value.table
+        };
+        this.assignmentService.addAssignment(newAssignment).subscribe(
+            res => {
+                this.assignments.push(res.data.assignment);
+                this.addAssignmentForm.reset();
+                for (const i in this.tables) {
+                    if (this.tables[i].id === newAssignment.tableId) {
+                        this.tables.splice(parseInt(i, 10), 1);
+                        break;
+                    }
+                }
+                this.toast.setMessage('Phân công thành công.', 'success');
+            },
+            err => console.log(err)
+        );
+    }
+
+    removeAssignment(assignment) {
+        this.assignmentService.removeAssignment(assignment).subscribe(
+            res => {
+                for (const i in this.assignments) {
+                    if (this.assignments[i].id === assignment.id) {
+                        this.assignments.splice(parseInt(i, 10), 1);
+                        break;
+                    }
+                }
+                this.getAssignableTableList();
+                this.toast.setMessage('Xóa phân công thành công.', 'success');
+            },
+            err => console.log(err)
+        );
+    }
+
+    private getAssignableTableList() {
+        this.tableService.getAllTables().subscribe(
+            res => {
+                this.tables = res.data.tables;
+                for (const i in this.tables) {
+                    if (this.tables[i]) {
+                        for (const j in this.assignments) {
+                            if (this.assignments[j].table.id === this.tables[i].id) {
+                                this.tables.splice(parseInt(i, 10), 1);
+                            }
+                        }
+                    }
+                }
+            },
+            err => console.log(err)
+        );
+    }
+
+    private getAssignmentList(staff) {
+        this.assignmentService.getByStaff(staff).subscribe(
+            res => {
+                console.log(res);
+                this.assignments = res.data.assignments;
+                console.log(this.assignments);
+            },
+            err => console.log(err)
+        );
+    }
+
+    enableAssigning(staff) {
+        this.isAssigning = true;
+        this.staff = staff;
+        this.getAssignmentList(staff);
+        this.getAssignableTableList();
     }
 
     private checkIfMatchingPasswords(pass: string, confirm: string) {
@@ -152,7 +245,6 @@ export class StaffComponent implements OnInit {
     }
 
     addStaff() {
-        console.log(this.addStaffForm.value);
         const newStaff = this.addStaffForm.value;
         const formData = new FormData();
         formData.append('firstname', newStaff.firstname);
@@ -172,7 +264,6 @@ export class StaffComponent implements OnInit {
 
     updateStaff(staff) {
         staff.gender = staff.gender === 'Nam' ? 'true' : 'false';
-        console.log(staff);
         this.staffService.updateStaff(staff).subscribe(
             res => {
                 this.isEditing = false;

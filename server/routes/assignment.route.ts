@@ -39,7 +39,6 @@ assignmentRouter.route('/').put(
 );
 
 assignmentRouter.route('/staff').get(
-    parseJwt('admin'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         assignmentController.getAssignmentListByStaffId(req)
             .then(
@@ -58,7 +57,6 @@ assignmentRouter.route('/staff').get(
 );
 
 assignmentRouter.route('/table').get(
-    parseJwt('admin'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         assignmentController.getAssignmentListByTableId(req)
             .then(

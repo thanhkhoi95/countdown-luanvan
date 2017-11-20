@@ -11,6 +11,7 @@ import { TableService } from './services/table.service';
 import { StaffService } from './services/staff.service';
 import { CategoryService } from './services/category.service';
 import { FoodService } from './services/food.service';
+import { AssignmentService } from './services/assignment.service';
 
 import { AuthGuardLogin } from './services/auth-guard-login.service';
 import { AuthGuardAdmin } from './services/auth-guard-admin.service';
@@ -54,7 +55,8 @@ import { FoodComponent } from './food/food.component';
     TableService,
     StaffService,
     CategoryService,
-    FoodService
+    FoodService,
+    AssignmentService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]
