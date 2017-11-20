@@ -122,7 +122,6 @@ function getFood(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function updateFood(request: express.Request): Promise<ISuccess | IError> {
-    console.log(123);
     return foodDao.getOriginFood(request.query.id)
         .then(
         (responsedFood) => {
@@ -198,7 +197,31 @@ function getFoodList(request: express.Request): Promise<ISuccess | IError> {
     if (!request.query.pagesize) {
         request.query.pagesize = '20';
     }
-    return foodDao.getAllFoods(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+    return foodDao.getFoodList(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get foods successfully.',
+            data: {
+                foods: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function getAllFood(request: express.Request): Promise<ISuccess | IError> {
+    return foodDao.getAllFood()
         .then(
         (response) => Promise.resolve({
             message: 'Get foods successfully.',
@@ -226,5 +249,6 @@ export const foodController = {
     setActiveFood: setActiveFood,
     getFood: getFood,
     updateFood: updateFood,
-    getFoodList: getFoodList
+    getFoodList: getFoodList,
+    getAllFood: getAllFood
 };

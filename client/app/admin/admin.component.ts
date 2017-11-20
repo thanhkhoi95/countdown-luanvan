@@ -8,33 +8,12 @@ import { UserService } from '../services/user.service';
   selector: 'app-admin',
   templateUrl: './admin.component.html'
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent {
 
   users = [];
-  isLoading = true;
+  isLoading = false;
 
   constructor(public auth: AuthService,
-              public toast: ToastComponent,
-              private userService: UserService) { }
-
-  ngOnInit() {
-    this.getUsers();
-  }
-
-  getUsers() {
-    this.userService.getUsers().subscribe(
-      data => this.users = data,
-      error => console.log(error),
-      () => this.isLoading = false
-    );
-  }
-
-  deleteUser(user) {
-    this.userService.deleteUser(user).subscribe(
-      data => this.toast.setMessage('user deleted successfully.', 'success'),
-      error => console.log(error),
-      () => this.getUsers()
-    );
-  }
+              public toast: ToastComponent) { }
 
 }

@@ -3,6 +3,30 @@ import { IError, ISuccess, cryptoUtils } from '../shared';
 import { userDao, tableDao } from '../dao';
 import { IUser, IUserModel, ITable } from '../models';
 
+function getAllTable(request: express.Request): Promise<ISuccess | IError> {
+    return tableDao.getAllTables()
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get all tables successfully.',
+            data: {
+                tables: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
 function createTable(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.username || !request.body.password || !request.body.name) {
         return Promise.reject({
@@ -79,7 +103,7 @@ function setActiveTable(request: express.Request): Promise<ISuccess | IError> {
                 .then(
                 (deactivatedTable) => {
                     return Promise.resolve({
-                        message: 'Deactivate table successfully.',
+                        message: 'Set active table successfully.',
                         data: {
                             table: deactivatedTable
                         }
@@ -141,10 +165,7 @@ function getTable(request: express.Request): Promise<ISuccess | IError> {
 function updateTable(request: express.Request): Promise<ISuccess | IError> {
     return tableDao.getOriginTable(request.query.id)
         .then(
-        (responsedTable ) => {
-            if (request.body.gender === undefined) {
-                request.body.gender = responsedTable.gender;
-            }
+        (responsedTable) => {
             const table: ITable = {
                 id: request.query.id,
                 name: request.body.name || responsedTable.name,
@@ -197,8 +218,8 @@ function getTableList(request: express.Request): Promise<ISuccess | IError> {
     if (!request.query.pagesize) {
         request.query.pagesize = '20';
     }
-    return tableDao.getAllTables(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
-    .then(
+    return tableDao.getTableList(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+        .then(
         (response) => Promise.resolve({
             message: 'Get tables successfully.',
             data: {
@@ -225,5 +246,6 @@ export const tableController = {
     setActiveTable: setActiveTable,
     getTable: getTable,
     updateTable: updateTable,
-    getTableList: getTableList
+    getTableList: getTableList,
+    getAllTable: getAllTable
 };

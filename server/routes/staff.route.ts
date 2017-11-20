@@ -67,8 +67,8 @@ staffRouter.route('/setactive').put(
 );
 
 staffRouter.route('/').put(
+    parseJwt('admin'),
     multipartyMiddleware,
-    parseJwt('staffEx'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         staffController.updateStaff(req)
             .then(
@@ -88,7 +88,7 @@ staffRouter.route('/').put(
 );
 
 staffRouter.route('/avatar').put(
-    parseJwt('staffEx'),
+    parseJwt('admin'),
     multipartyMiddleware,
     uploadImage,
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -105,11 +105,30 @@ staffRouter.route('/avatar').put(
                 });
             }
             );
-    });
+    }
+);
 
-staffRouter.route('/getAll').get(
+staffRouter.route('/getlist').get(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         staffController.getStaffList(req)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
+staffRouter.route('/getall').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        staffController.getAllStaffs(req)
             .then(
             response => {
                 res.send(response);

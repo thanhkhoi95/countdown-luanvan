@@ -103,14 +103,13 @@ function updateCategory(category: ICategory): Promise<any> {
         );
 }
 
-function getAllCategories(pageIndex: number, pageSize: number): Promise<any> {
+function getCategoryList(pageIndex: number, pageSize: number): Promise<any> {
     return CategoryModel.count({})
         .then(
         (count: number) => {
             return CategoryModel.find({}).sort({ name: -1 })
                 .skip((pageIndex > 0) ? (pageIndex - 1) * pageSize : 0)
                 .limit(pageSize)
-                .populate('userId')
                 .then(
                 tables => {
                     const response = paginate(tables, count, pageIndex, pageSize);
@@ -137,9 +136,27 @@ function getAllCategories(pageIndex: number, pageSize: number): Promise<any> {
         );
 }
 
+function getAllCategories(): Promise<any> {
+    return CategoryModel.find({}).sort({ name: -1 })
+        .then(
+        tables => {
+            return Promise.resolve(tables);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const categoryDao = {
     insertCategory: insertCategory,
     updateCategory: updateCategory,
     getCategory: getCategory,
+    getCategoryList: getCategoryList,
     getAllCategories: getAllCategories
 };

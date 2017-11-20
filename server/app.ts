@@ -13,7 +13,8 @@ import {
     kitchenRouter,
     categoryRouter,
     foodRouter,
-    assignmentRouter
+    assignmentRouter,
+    imageRouter
 } from './routes';
 
 const app = express();
@@ -23,7 +24,7 @@ app.set('baseUri', '/api');
 
 
 
-// app.use('/', express.static(path.join(__dirname, '../public')));
+app.use('/', express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -69,11 +70,11 @@ db.once('open', () => {
     app.use(`${app.get('baseUri')}/category`, categoryRouter);
     app.use(`${app.get('baseUri')}/food`, foodRouter);
     app.use(`${app.get('baseUri')}/assignment`, assignmentRouter);
+    app.use(`${app.get('baseUri')}/image`, imageRouter);
 
-
-    // app.get('/*', function(req, res) {
-    //   res.sendFile(path.join(__dirname, '../public/index.html'));
-    // });
+    app.get('/*', function(req, res) {
+      res.sendFile(path.join(__dirname, '../public/index.html'));
+    });
 
     if (!module.parent) {
         app.listen(app.get('port'), () => {

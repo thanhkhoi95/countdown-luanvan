@@ -107,6 +107,7 @@ function setActiveStaff(request: express.Request): Promise<ISuccess | IError> {
                 birthdate: responsedStaff.birthdate,
                 gender: responsedStaff.gender,
                 userId: responsedStaff.userId,
+                avatar: responsedStaff.avatar,
                 active: request.query.state
             };
             return staffDao.updateStaff(staff)
@@ -179,6 +180,7 @@ function updateAvatar(request: express.Request): Promise<ISuccess | IError> {
             message: 'Invalid image.'
         });
     }
+    console.log(request.body);
     return staffDao.getOriginStaff(request.query.id)
         .then(
         (responsedStaff) => {
@@ -240,6 +242,7 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.getOriginStaff(request.query.id)
         .then(
         (responsedStaff) => {
+            console.log(request.body);
             if (request.body.gender === undefined) {
                 request.body.gender = responsedStaff.gender;
             }
@@ -253,6 +256,7 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
                 active: responsedStaff.active,
                 avatar: responsedStaff.avatar
             };
+            console.log(staff);
             return staffDao.updateStaff(staff)
                 .then(
                 (updatedStaff) => {
@@ -299,7 +303,31 @@ function getStaffList(request: express.Request): Promise<ISuccess | IError> {
     if (!request.query.pagesize) {
         request.query.pagesize = '20';
     }
-    return staffDao.getAllStaffs(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+    return staffDao.getStaffList(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get staffs successfully.',
+            data: {
+                staffs: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function getAllStaffs(request: express.Request): Promise<ISuccess | IError> {
+    return staffDao.getAllStaffs()
         .then(
         (response) => Promise.resolve({
             message: 'Get staffs successfully.',
@@ -324,10 +352,10 @@ function getStaffList(request: express.Request): Promise<ISuccess | IError> {
 
 export const staffController = {
     createStaff: createStaff,
-    // deleteStaff: deleteStaff
     setActiveStaff: setActiveStaff,
     getStaff: getStaff,
     updateStaff: updateStaff,
     updateAvatar: updateAvatar,
-    getStaffList: getStaffList
+    getStaffList: getStaffList,
+    getAllStaffs: getAllStaffs
 };

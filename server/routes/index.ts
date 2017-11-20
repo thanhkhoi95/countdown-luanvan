@@ -6,3 +6,4 @@ export * from './kitchen.route';
 export * from './category.route';
 export * from './food.route';
 export * from './assignment.route';
+export * from './image.route';

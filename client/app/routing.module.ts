@@ -1,33 +1,41 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
-import { CatsComponent } from './cats/cats.component';
-import { AboutComponent } from './about/about.component';
-import { RegisterComponent } from './register/register.component';
 import { LoginComponent } from './login/login.component';
 import { LogoutComponent } from './logout/logout.component';
-import { AccountComponent } from './account/account.component';
 import { AdminComponent } from './admin/admin.component';
+import { LayoutComponent } from './layout/layout.component';
 import { NotFoundComponent } from './not-found/not-found.component';
+import { TableComponent } from './table/table.component';
+import { StaffComponent } from './staff/staff.component';
+import { CategoryComponent } from './category/category.component';
+import { FoodComponent } from './food/food.component';
 
 import { AuthGuardLogin } from './services/auth-guard-login.service';
 import { AuthGuardAdmin } from './services/auth-guard-admin.service';
+import { AuthGuardLayout } from './services/auth-guard-layout.service';
 
 const routes: Routes = [
-  { path: '', component: AboutComponent },
-  { path: 'cats', component: CatsComponent },
-  { path: 'register', component: RegisterComponent },
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [AuthGuardLogin] },
   { path: 'logout', component: LogoutComponent },
-  { path: 'account', component: AccountComponent, canActivate: [AuthGuardLogin] },
-  { path: 'admin', component: AdminComponent, canActivate: [AuthGuardAdmin] },
-  { path: 'notfound', component: NotFoundComponent },
-  { path: '**', redirectTo: '/notfound' },
+  {
+    path: 'home',
+    component: LayoutComponent,
+    children: [
+      { path: 'admin', component: AdminComponent, canActivate: [AuthGuardAdmin] },
+      { path: 'table', component: TableComponent, canActivate: [AuthGuardAdmin] },
+      { path: 'staff', component: StaffComponent, canActivate: [AuthGuardAdmin] },
+      { path: 'category', component: CategoryComponent, canActivate: [AuthGuardAdmin]},
+      { path: 'food', component: FoodComponent, canActivate: [AuthGuardAdmin]}
+    ],
+    canActivate: [AuthGuardLayout]
+  },
+  { path: '**', redirectTo: '/home' }
 ];
 
 @NgModule({
-  imports: [ RouterModule.forRoot(routes) ],
-  exports: [ RouterModule ]
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
 })
 
-export class RoutingModule {}
+export class RoutingModule { }

@@ -79,10 +79,29 @@ categoryRouter.route('/').put(
     }
 );
 
-categoryRouter.route('/getAll').get(
+categoryRouter.route('/getlist').get(
     parseJwt('admin'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         categoryController.getCategoryList(req)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
+categoryRouter.route('/getall').get(
+    parseJwt('admin'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        categoryController.getAllCategory(req)
             .then(
             response => {
                 res.send(response);

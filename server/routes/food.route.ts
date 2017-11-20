@@ -83,9 +83,27 @@ foodRouter.route('/setactive').put(
     }
 );
 
-foodRouter.route('/getAll').get(
+foodRouter.route('/getlist').get(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         foodController.getFoodList(req)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
+foodRouter.route('/getall').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        foodController.getAllFood(req)
             .then(
             response => {
                 res.send(response);

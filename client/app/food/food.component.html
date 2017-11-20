@@ -1,0 +1,122 @@
+<app-loading [condition]="isLoading"></app-loading>
+
+<app-toast [message]="toast.message"></app-toast>
+
+<div class="card" *ngIf="!isLoading">
+  <h4 class="card-header">Số món ăn hiện có ({{foods.length}})</h4>
+  <div class="card-block">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-default" *ngIf="!isEditing">
+        <tr>
+          <th>Hình</th>
+          <th>Tên</th>
+          <th>Mô tả</th>
+          <th>Danh mục</th>
+          <th>Giá</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="foods.length === 0">
+        <tr>
+          <td colspan="7">Không có dữ liệu. Vui lòng nhập mới.</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!isEditing">
+        <tr *ngFor="let food of foods">
+          <td>
+            <img [src]="'/api/image/' + food.pictures[0]" alt="" style="width:70px">
+          </td>
+          <td>{{food.name}}</td>
+          <td>{{food.description}}</td>
+          <td>{{food.categories[0].name}}</td>
+          <td>{{food.price}}</td>
+          <td>
+            <button class="btn btn-sm btn-warning" (click)="enableEditing(food)">
+              <i class="fa fa-pencil"></i> Edit</button>
+            <input class="inputfile" name="picture" id="picture" type="file" accept=".jpg,.png" (change)="changePicture($event, food);">
+            <label class="btn btn-sm btn-warning " for="picture">
+              <i class="fa fa-picture-o"></i> Change picture</label>
+            <button *ngIf="!food.active" class="btn btn-sm btn-primary" (click)="activeStaff(food)">
+              <i class="fa fa-trash"></i> Active</button>
+            <button *ngIf="food.active" class="btn btn-sm btn-danger" (click)="deactiveStaff(food)">
+              <i class="fa fa-trash"></i> Deactive</button>
+          </td>
+        </tr>
+      </tbody>
+      <td colspan='7' *ngIf="isEditing">
+        <form class="form-inline edit-form" #form="ngForm" (ngSubmit)="updateFood(food)" style="display:inline-table; width: 100%">
+          <div class="form-group edit-input">
+            <label>
+              <b>Tên: </b>
+            </label>
+            <input class="form-control" type="text" name="name" [(ngModel)]="food.name" placeholder="Tên món ăn" required>
+          </div>
+          <div class="form-group edit-input">
+            <label>
+              <b>Mô tả: </b>
+            </label>
+            <textarea class="form-control" rows="3" name="description" [(ngModel)]="food.description"></textarea>
+          </div>
+          <div class="form-group edit-input">
+            <label>
+              <b>Danh mục: </b>
+            </label>
+            <select class="form-control" name="category" [(ngModel)]="food.category">
+              <option *ngFor="let category of categories" [ngValue]="category.id">{{category.name}}</option>
+            </select>
+          </div>
+          <br>
+          <button class="btn btn-sm btn-primary edit-input" type="submit" [disabled]="!form.form.valid">
+            <i class="fa fa-floppy-o"></i> Save</button>
+          <button class="btn btn-sm btn-warning edit-input" (click)="cancelEditing()">
+            <i class="fa fa-times"></i> Cancel</button>
+        </form>
+      </td>
+    </table>
+  </div>
+</div>
+<!-- 
+<div class="card" *ngIf="!isEditing">
+  <h4 class="card-header">Thêm nhân viên mới</h4>
+  <div class="card-block">
+    <form class="form-inline" [formGroup]="addStaffForm" (ngSubmit)="addStaff()" style="text-align:center">
+      <div class="form-group edit-input">
+        <b>Họ: </b>
+        <input class="form-control" type="text" name="lastname" formControlName="lastname" placeholder="Họ">
+      </div>
+      <div class="form-group edit-input">
+        <b>Tên: </b>
+        <input class="form-control" type="text" name="firstname" formControlName="firstname" placeholder="Tên">
+      </div>
+      <div class="form-group edit-input">
+        <b>Giới tính: </b>
+        <select class="form-control" name="gender" formControlName="gender">
+          <option value="" disabled selected>Giới tính</option>
+          <option value="Nu" selected>Nữ</option>
+          <option value="Nam">Nam</option>
+        </select>
+      </div>
+      <div class="form-group edit-input">
+        <b>Ngày sinh: </b>
+        <input class="form-control" type="date" name="birthdate" formControlName="birthdate">
+      </div>
+      <div class="form-group edit-input">
+        <b>Tên đăng nhập: </b>
+        <input class="form-control" type="text" name="username" formControlName="username" placeholder="Tên đăng nhập" min="0" required>
+      </div>
+      <div class="form-group edit-input">
+        <b>Mật khẩu: </b>
+        <input class="form-control" type="password" name="password" formControlName="password" placeholder="Mật khẩu" step="any"
+          min="0" required>
+      </div>
+      <div class="form-group edit-input">
+        <b>Nhập lại mật khẩu: </b>
+        <input class="form-control" type="password" name="passwordConfirm" formControlName="passwordConfirm" placeholder="Nhập lại mật khẩu"
+          step="any" min="0" required>
+      </div>
+      <br>
+      <button class="btn btn-primary  edit-input" type="submit" [disabled]="!addStaffForm.valid">
+        <i class="fa fa-floppy-o"></i> Add</button>
+    </form>
+  </div>
+</div> -->

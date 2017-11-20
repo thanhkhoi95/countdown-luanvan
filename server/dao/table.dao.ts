@@ -246,7 +246,7 @@ function updateTable(table: ITable): Promise<any> {
         );
 }
 
-function getAllTables(pageIndex: number, pageSize: number): Promise<any> {
+function getTableList(pageIndex: number, pageSize: number): Promise<any> {
     return TableModel.count({})
         .then(
         (count: number) => {
@@ -285,6 +285,30 @@ function getAllTables(pageIndex: number, pageSize: number): Promise<any> {
         );
 }
 
+function getAllTables(): Promise<any> {
+    return TableModel.find({}).sort({ name: -1 })
+        .populate('userId')
+        .then(
+        tables => {
+            const response = [];
+            for (const i in tables) {
+                if (tables[i]) {
+                    response[i] = convertTableToResponseObject(tables[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const tableDao = {
     insertTable: insertTable,
     removeTable: removeTable,
@@ -292,5 +316,6 @@ export const tableDao = {
     getOriginTable: getOriginTable,
     getPopulatedTableById: getPopulatedTableById,
     getPopulatedTableByUserId: getPopulatedTableByUserId,
+    getTableList: getTableList,
     getAllTables: getAllTables
 };

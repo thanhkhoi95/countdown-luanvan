@@ -1,0 +1,68 @@
+<app-loading [condition]="isLoading"></app-loading>
+
+<app-toast [message]="toast.message"></app-toast>
+
+<div class="card" *ngIf="!isLoading">
+  <h4 class="card-header">Số danh mục hiện có ({{categories.length}})</h4>
+  <div class="card-block">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-default">
+        <tr>
+          <th>Tên danh mục</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="categories.length === 0">
+        <tr>
+          <td colspan="3">Không có dữ liệu. Vui lòng nhập mới.</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!isEditing">
+        <tr *ngFor="let category of categories">
+          <td>{{category.name}}</td>
+          <td>
+            <button class="btn btn-sm btn-warning" (click)="enableEditing(category)">
+              <i class="fa fa-pencil"></i> Edit</button>
+            <button *ngIf="!category.active" class="btn btn-sm btn-primary" (click)="activeTable(category)">
+              <i class="fa fa-trash"></i> Active</button>
+            <button *ngIf="category.active" class="btn btn-sm btn-danger" (click)="deactiveTable(category)">
+              <i class="fa fa-trash"></i> Deactive</button>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="isEditing">
+        <tr>
+          <td colspan="3">
+            <form class="form-inline" #form="ngForm" (ngSubmit)="updateCategory(category)" style="display:inline-table; width: 100%">
+              <tr>
+                <td>
+                  <div class="form-group">
+                    <input class="form-control" type="text" name="name" [(ngModel)]="category.name" placeholder="Tên danh mục" required>
+                  </div>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-primary" type="submit" [disabled]="!form.form.valid">
+                    <i class="fa fa-floppy-o"></i> Save</button>
+                  <button class="btn btn-sm btn-warning" (click)="cancelEditing()">
+                    <i class="fa fa-times"></i> Cancel</button>
+                </td>
+              </tr>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" *ngIf="!isEditing">
+  <h4 class="card-header">Thêm danh mục mới</h4>
+  <div class="card-block">
+    <form class="form-inline" [formGroup]="addCategoryForm" (ngSubmit)="addCategory()" style="text-align:center">
+      <div class="form-group">
+        <input class="form-control" type="text" name="name" formControlName="name" placeholder="Tên danh mục">
+      </div>
+      <button class="btn btn-primary" type="submit" [disabled]="!addCategoryForm.valid"><i class="fa fa-floppy-o"></i> Add</button>
+    </form>
+  </div>
+</div>

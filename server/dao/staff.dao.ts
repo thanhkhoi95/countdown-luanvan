@@ -231,7 +231,7 @@ function updateStaff(staff: IStaff): Promise<any> {
         );
 }
 
-function getAllStaffs(pageIndex: number, pageSize: number): Promise<any> {
+function getStaffList(pageIndex: number, pageSize: number): Promise<any> {
     return StaffModel.count({})
         .then(
         (count: number) => {
@@ -270,6 +270,30 @@ function getAllStaffs(pageIndex: number, pageSize: number): Promise<any> {
         );
 }
 
+function getAllStaffs(): Promise<any> {
+    return StaffModel.find({}).sort({ firstname: -1 })
+        .populate('userId')
+        .then(
+        staffs => {
+            const response = [];
+            for (const i in staffs) {
+                if (staffs[i]) {
+                    response[i] = convertStaffToResponseObject(staffs[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const staffDao = {
     insertStaff: insertStaff,
     removeStaff: removeStaff,
@@ -277,5 +301,6 @@ export const staffDao = {
     getOriginStaff: getOriginStaff,
     getPopulatedStaffById: getPopulatedStaffById,
     getPopulatedStaffByUserId: getPopulatedStaffByUserId,
+    getStaffList: getStaffList,
     getAllStaffs: getAllStaffs
 };

@@ -166,7 +166,31 @@ function getCategoryList(request: express.Request): Promise<ISuccess | IError> {
     if (!request.query.pagesize) {
         request.query.pagesize = '20';
     }
-    return categoryDao.getAllCategories(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+    return categoryDao.getCategoryList(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+        .then(
+        (response) => Promise.resolve({
+            message: 'Get categories successfully.',
+            data: {
+                categories: response
+            }
+        })
+        )
+        .catch(
+        error => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function getAllCategory(request: express.Request): Promise<ISuccess | IError> {
+    return categoryDao.getAllCategories()
         .then(
         (response) => Promise.resolve({
             message: 'Get categories successfully.',
@@ -194,5 +218,6 @@ export const categoryController = {
     setActiveCategory: setActiveCategory,
     getCategory: getCategory,
     updateCategory: updateCategory,
-    getCategoryList: getCategoryList
+    getCategoryList: getCategoryList,
+    getAllCategory: getAllCategory
 };

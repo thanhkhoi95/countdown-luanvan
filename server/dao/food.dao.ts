@@ -8,6 +8,7 @@ function convertToResponseObject(food) {
         description: food.description,
         pictures: food.pictures,
         categories: food.categories,
+        price: food.price,
         active: food.active,
         id: food.id
     };
@@ -195,7 +196,7 @@ function updateFood(food: IFood): Promise<any> {
         );
 }
 
-function getAllFoods(pageIndex: number, pageSize: number): Promise<any> {
+function getFoodList(pageIndex: number, pageSize: number): Promise<any> {
     return FoodModel.count({})
         .then(
         (count: number) => {
@@ -237,10 +238,38 @@ function getAllFoods(pageIndex: number, pageSize: number): Promise<any> {
         );
 }
 
+function getAllFood(): Promise<any> {
+    return FoodModel.find({}).sort({ firstname: -1 })
+        .populate({
+            path: 'categories',
+            model: 'category'
+        })
+        .then(
+        foods => {
+            const response = [];
+            for (const i in foods) {
+                if (foods[i]) {
+                    response[i] = convertToResponseObject(foods[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const foodDao = {
     insertFood: insertFood,
     updateFood: updateFood,
     getOriginFood: getOriginFood,
     getPopulatedFoodById: getPopulatedFoodById,
-    getAllFoods: getAllFoods
+    getFoodList: getFoodList,
+    getAllFood: getAllFood
 };

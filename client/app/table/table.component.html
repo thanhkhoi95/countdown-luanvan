@@ -1,0 +1,85 @@
+<app-loading [condition]="isLoading"></app-loading>
+
+<app-toast [message]="toast.message"></app-toast>
+
+<div class="card" *ngIf="!isLoading">
+  <h4 class="card-header">Số bàn hiện có ({{tables.length}})</h4>
+  <div class="card-block">
+    <table class="table table-bordered table-striped">
+      <thead class="thead-default">
+        <tr>
+          <th>Tên bàn</th>
+          <th>Tên đăng nhập</th>
+          <th>Thao tác</th>
+        </tr>
+      </thead>
+      <tbody *ngIf="tables.length === 0">
+        <tr>
+          <td colspan="3">Không có dữ liệu. Vui lòng nhập mới.</td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="!isEditing">
+        <tr *ngFor="let table of tables">
+          <td>{{table.name}}</td>
+          <td>{{table.username}}</td>
+          <td>
+            <button class="btn btn-sm btn-warning" (click)="enableEditing(table)">
+              <i class="fa fa-pencil"></i> Edit</button>
+            <button *ngIf="!table.active" class="btn btn-sm btn-primary" (click)="activeTable(table)">
+              <i class="fa fa-trash"></i> Active</button>
+            <button *ngIf="table.active" class="btn btn-sm btn-danger" (click)="deactiveTable(table)">
+              <i class="fa fa-trash"></i> Deactive</button>
+          </td>
+        </tr>
+      </tbody>
+      <tbody *ngIf="isEditing">
+        <tr>
+          <td colspan="3">
+            <form class="form-inline" #form="ngForm" (ngSubmit)="updateTable(table)" style="display:inline-table; width: 100%">
+              <tr>
+                <td>
+                  <div class="form-group">
+                    <input class="form-control" type="text" name="name" [(ngModel)]="table.name" placeholder="Tên bàn" required>
+                  </div>
+                </td>
+                <td>
+                  <div class="form-group">
+                    <input class="form-control" type="text" name="username" [(ngModel)]="table.username" placeholder="Tên đăng nhập" required
+                      disabled>
+                  </div>
+                </td>
+                <td>
+                  <button class="btn btn-sm btn-primary" type="submit" [disabled]="!form.form.valid">
+                    <i class="fa fa-floppy-o"></i> Save</button>
+                  <button class="btn btn-sm btn-warning" (click)="cancelEditing()">
+                    <i class="fa fa-times"></i> Cancel</button>
+                </td>
+              </tr>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" *ngIf="!isEditing">
+  <h4 class="card-header">Thêm bàn mới</h4>
+  <div class="card-block">
+    <form class="form-inline" [formGroup]="addTableForm" (ngSubmit)="addTable()" style="text-align:center">
+      <div class="form-group">
+        <input class="form-control" type="text" name="name" formControlName="name" placeholder="Tên bàn">
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="text" name="username" formControlName="username" placeholder="Tên đăng nhập" min="0" required>
+      </div>
+      <div class="form-group">
+        <input class="form-control" type="password" name="password" formControlName="password" placeholder="Mật khẩu" step="any" min="0" required>
+      </div>
+      <div class="form-group">
+          <input class="form-control" type="password" name="passwordConfirm" formControlName="passwordConfirm" placeholder="Nhập lại mật khẩu" step="any" min="0" required>
+        </div>
+      <button class="btn btn-primary" type="submit" [disabled]="!addTableForm.valid"><i class="fa fa-floppy-o"></i> Add</button>
+    </form>
+  </div>
+</div>
