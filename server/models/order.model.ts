@@ -1,18 +1,19 @@
 import * as mongoose from 'mongoose';
 
 interface FoodRef {
-    foodId: string;
-    name: string;
+    food: string;
     price: number;
-    numb: number;
-    date: Date;
+    quantity: number;
+    uid: string;
+    status: String;
 }
 
 export interface IOrder {
     id?: string;
     foods: FoodRef[];
-    tableId: string;
-    clientName: string;
+    table: string;
+    date: Date;
+    status: String;
 }
 
 export interface IOrderModel extends IOrder, mongoose.Document { }
@@ -20,6 +21,10 @@ export interface IOrderModel extends IOrder, mongoose.Document { }
 const orderSchema = new mongoose.Schema(
     {
         foods: [{
+            uid: {
+                type: String,
+                required: true
+            },
             food: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'food'
@@ -27,16 +32,22 @@ const orderSchema = new mongoose.Schema(
             price: {
                 type: Number
             },
-            numb: {
+            quantity: {
                 type: Number
-            }
+            },
+            status: {
+                type: String
+            },
         }],
-        tableId: {
+        table: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
         },
         date: {
             type: Date
+        },
+        status: {
+            type: String
         }
     },
     {

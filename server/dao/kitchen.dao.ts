@@ -1,7 +1,7 @@
 import { KitchenModel, IKitchen, IKitchenModel } from '../models';
 import { paginate } from '../shared';
 
-function convertToResponseObject(kitchen) {
+export function convertKitchenToResponseObject(kitchen) {
     return {
         name: kitchen.name,
         lowercaseName: kitchen.lowercaseName,
@@ -20,7 +20,7 @@ function getPopulatedKitchenById(kitchenId: string): Promise<any> {
                 return responsedKitchen.populate('userId').execPopulate()
                     .then(
                     (populatedKitchen: IKitchen) => {
-                        return Promise.resolve(convertToResponseObject(populatedKitchen));
+                        return Promise.resolve(convertKitchenToResponseObject(populatedKitchen));
                     }
                     )
                     .catch(
@@ -61,7 +61,7 @@ function getPopulatedKitchenByUserId(userId: string): Promise<any> {
                 return responsedKitchen.populate('userId').execPopulate()
                     .then(
                     (populatedKitchen: IKitchen) => {
-                        return Promise.resolve(convertToResponseObject(populatedKitchen));
+                        return Promise.resolve(convertKitchenToResponseObject(populatedKitchen));
                     }
                     )
                     .catch(
@@ -134,7 +134,7 @@ function insertKitchen(kitchen: IKitchen): Promise<any> {
                         return responsedKitchen.populate('userId').execPopulate()
                             .then(
                             (populatedKitchen: IKitchen) => {
-                                return Promise.resolve(convertToResponseObject(populatedKitchen));
+                                return Promise.resolve(convertKitchenToResponseObject(populatedKitchen));
                             }
                             )
                             .catch(
@@ -213,7 +213,7 @@ function updateKitchen(kitchen: IKitchen): Promise<any> {
                     return updatedKitchen.populate('userId').execPopulate()
                         .then(
                         (populatedKitchen: IKitchen) => {
-                            return Promise.resolve(convertToResponseObject(populatedKitchen));
+                            return Promise.resolve(convertKitchenToResponseObject(populatedKitchen));
                         }
                         )
                         .catch(
@@ -259,7 +259,7 @@ function getAllKitchens(pageIndex: number, pageSize: number): Promise<any> {
                     const response = paginate(kitchens, count, pageIndex, pageSize);
                     for (const i in response.items) {
                         if (response.items[i]) {
-                            response.items[i] = convertToResponseObject(response.items[i]);
+                            response.items[i] = convertKitchenToResponseObject(response.items[i]);
                         }
                     }
                     return Promise.resolve(response);

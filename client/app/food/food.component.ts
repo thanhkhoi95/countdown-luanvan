@@ -88,6 +88,7 @@ export class FoodComponent implements OnInit {
         formData.append('price', food.price);
         formData.append('pictures', '');
         formData.append('categories', food.categories[0].id);
+        console.log(food);
 
         this.foodService.changePicture(food, formData).subscribe(
             res => {

@@ -6,6 +6,7 @@ export function convertTableToResponseObject(table) {
         name: table.name,
         lowercaseName: table.lowercaseName,
         id: table.id,
+        status: table.status,
         active: table.active
     };
 }
@@ -178,6 +179,7 @@ function updateTable(table: ITable): Promise<any> {
         .then(
         (responsedTable) => {
             responsedTable.name = table.name;
+            responsedTable.status = table.status;
             responsedTable.active = table.active;
             return responsedTable.save()
                 .then(

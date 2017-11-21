@@ -5,8 +5,8 @@ import { paginate } from '../shared';
 function convertToResponseObject(assignment) {
     return {
         id: assignment.id,
-        staff: convertStaff(assignment.staffId),
-        table: convertTable(assignment.tableId)
+        staff: convertStaff(assignment.staff),
+        table: convertTable(assignment.table)
     };
 }
 
@@ -38,7 +38,7 @@ function getAssignmentById(assignmentId: string): Promise<any> {
     return AssignmentModel.findOne({ _id: assignmentId })
         .then((responsedAssignment) => {
             if (responsedAssignment) {
-                return responsedAssignment.populate('staffId').populate('tableId').execPopulate()
+                return responsedAssignment.populate('staff').populate('table').execPopulate()
                     .then((populatedAssignment) => {
                         return Promise.resolve(convertToResponseObject(populatedAssignment));
                     })
@@ -68,8 +68,8 @@ function getAssignmentById(assignmentId: string): Promise<any> {
 }
 
 function getAssignmentListByStaffId(staffId: string): Promise<any> {
-    return AssignmentModel.find({ staffId: staffId })
-        .populate('staffId').populate('tableId')
+    return AssignmentModel.find({ staff: staffId })
+        .populate('staff').populate('table')
         .then(
         assignments => {
             const data = [];
@@ -92,12 +92,10 @@ function getAssignmentListByStaffId(staffId: string): Promise<any> {
 }
 
 function getAssignmentActiveListByStaffId(staffId: string): Promise<any> {
-    console.log(staffId);
-    return AssignmentModel.find({ staffId: staffId })
-        .populate('staffId').populate('tableId')
+    return AssignmentModel.find({ staff: staffId })
+        .populate('staff').populate('table')
         .then(
         assignments => {
-            console.log(assignments);
             const data = [];
             for (let i = 0; i < assignments.length; i++) {
                 if (assignments[i]) {
@@ -124,7 +122,7 @@ function getAssignmentActiveListByStaffId(staffId: string): Promise<any> {
 
 function getAssignmentListByTableId(tableId: string): Promise<any> {
     return AssignmentModel.find({ tableId: tableId })
-        .populate('staffId').populate('tableId')
+        .populate('staff').populate('table')
         .then(
         assignments => {
             const data = [];
@@ -151,7 +149,7 @@ function insertAssignment(assignment: IAssignment): Promise<any> {
     return newAssignment.save()
         .then(
         (responsedAssignment) => {
-            return responsedAssignment.populate('staffId').populate('tableId').execPopulate()
+            return responsedAssignment.populate('staff').populate('table').execPopulate()
                 .then(
                 (populatedAssignment) => {
                     return Promise.resolve(convertToResponseObject(populatedAssignment));
@@ -168,7 +166,6 @@ function insertAssignment(assignment: IAssignment): Promise<any> {
         })
         .catch(
         (error) => {
-            console.log(error);
             return Promise.reject({
                 statusCode: 500,
                 message: 'Internal server error.'
@@ -180,12 +177,12 @@ function updateAssignment(assignment: IAssignment): Promise<any> {
     return AssignmentModel.findOne({ _id: assignment.id })
         .then(
         (responsedAssignment) => {
-            responsedAssignment.staffId = assignment.staffId;
-            responsedAssignment.tableId = assignment.tableId;
+            responsedAssignment.staff = assignment.staff;
+            responsedAssignment.table = assignment.table;
             return responsedAssignment.save()
                 .then(
                 updatedAssignment => {
-                    return updatedAssignment.populate('staffId').populate('tableId').execPopulate()
+                    return updatedAssignment.populate('staff').populate('table').execPopulate()
                         .then(
                         (populatedAssignment: IAssignment) => {
                             return Promise.resolve(convertToResponseObject(populatedAssignment));

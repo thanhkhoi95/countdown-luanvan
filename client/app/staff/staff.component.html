@@ -60,9 +60,9 @@
           <td>
             <button class="btn btn-sm btn-warning" (click)="enableEditing(staff)">
               <i class="fa fa-pencil"></i> Edit</button>
-            <input class="inputfile" name="avatar" id="avatar" type="file" accept=".jpg,.png" (change)="changeAvatar($event, staff);">
-            <label class="btn btn-sm btn-warning " for="avatar">
-              <i class="fa fa-picture-o"></i> Change avatar</label>
+              <input class="inputfile" [name]="'avatar' + staff.id" [id]="'avatar' + staff.id" type="file" accept=".jpg,.png" (change)="changeAvatar($event, staff);">
+              <label class="btn btn-sm btn-warning " [for]="'avatar' + staff.id">
+                <i class="fa fa-picture-o"></i> Change avatar</label>
             <button class="btn btn-sm btn-warning" (click)="enableAssigning(staff)">
               <i class="fa fa-bolt"></i> Assign</button>
             <button *ngIf="!staff.active" class="btn btn-sm btn-primary" (click)="activeStaff(staff)">

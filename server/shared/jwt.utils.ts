@@ -6,7 +6,7 @@ const pub = fs.readFileSync(path.join(__dirname, '../key.pem'));
 const key = fs.readFileSync(path.join(__dirname, '../key.rsa'));
 
 export function tokenSign(obj: object, callback): void {
-    jwt.sign(obj, key, { algorithm: 'RS256', expiresIn: '1d' }, (err, token) => {
+    jwt.sign(obj, key, { algorithm: 'RS256'}, (err, token) => {
         if (err) {
             callback(err);
         } else {

@@ -2,19 +2,19 @@ import * as mongoose from 'mongoose';
 
 export interface IAssignment {
     id?: string;
-    staffId: string;
-    tableId: string;
+    staff: string;
+    table: string;
 }
 
 export interface IAssignmentModel extends IAssignment, mongoose.Document { }
 
 const AssignmentSchema = new mongoose.Schema(
     {
-        staffId: {
+        staff: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'staff'
         },
-        tableId: {
+        table: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
         }

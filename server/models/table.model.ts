@@ -6,6 +6,7 @@ export interface ITable {
     name: string;
     lowercaseName?: string;
     active: boolean;
+    status: string;
 }
 
 export interface ITableModel extends ITable, mongoose.Document { }
@@ -24,6 +25,9 @@ const tableSchema = new mongoose.Schema(
             type: Boolean,
             default: true,
             required: true
+        },
+        status: {
+            type: String
         }
     },
     {

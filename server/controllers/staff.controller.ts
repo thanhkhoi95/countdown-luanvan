@@ -180,7 +180,6 @@ function updateAvatar(request: express.Request): Promise<ISuccess | IError> {
             message: 'Invalid image.'
         });
     }
-    console.log(request.body);
     return staffDao.getOriginStaff(request.query.id)
         .then(
         (responsedStaff) => {
@@ -242,7 +241,6 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
     return staffDao.getOriginStaff(request.query.id)
         .then(
         (responsedStaff) => {
-            console.log(request.body);
             if (request.body.gender === undefined) {
                 request.body.gender = responsedStaff.gender;
             }
@@ -256,7 +254,6 @@ function updateStaff(request: express.Request): Promise<ISuccess | IError> {
                 active: responsedStaff.active,
                 avatar: responsedStaff.avatar
             };
-            console.log(staff);
             return staffDao.updateStaff(staff)
                 .then(
                 (updatedStaff) => {

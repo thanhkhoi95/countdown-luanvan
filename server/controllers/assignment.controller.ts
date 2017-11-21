@@ -4,15 +4,15 @@ import { userDao, assignmentDao } from '../dao';
 import { IAssignment } from '../models';
 
 function createAssignment(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.body.staffId || !request.body.tableId) {
+    if (!request.body.staff || !request.body.table) {
         return Promise.reject({
             statusCode: 400,
             message: 'Data fields missing.'
         });
     }
     const newAssignment: IAssignment = {
-        staffId: request.body.staffId,
-        tableId: request.body.tableId
+        staff: request.body.staff,
+        table: request.body.table
     };
     return assignmentDao.insertAssignment(newAssignment)
         .then(
@@ -69,8 +69,8 @@ function updateAssignment(request: express.Request): Promise<ISuccess | IError> 
         (responsedAssignment) => {
             const assignment: IAssignment = {
                 id: request.query.id,
-                staffId: request.body.staffId || responsedAssignment.staffId,
-                tableId: request.body.tableId || responsedAssignment.tableId,
+                staff: request.body.staff || responsedAssignment.staff,
+                table: request.body.table || responsedAssignment.table,
             };
             return assignmentDao.updateAssignment(assignment)
                 .then(

@@ -1,24 +1,71 @@
 import * as express from 'express';
-import { tableController } from '../controllers';
+import { tableController, assignmentController } from '../controllers';
 import { parseJwt } from '../middlewares';
+import { tokenVerify } from '../shared';
 
 export const tableRouter = express.Router();
 
-tableRouter.route('/getallactive').get(
+
+tableRouter.route('/updatestatus').put(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        tableController.getAllTable(req, true)
+        tableController.updateStatus(req)
             .then(
-            (response) => {
+            response => {
                 res.send(response);
             }
             )
             .catch(
-            (error) => {
+            error => {
                 res.status(error.statusCode).send({
                     message: error.message
                 });
             }
             );
+    }
+);
+
+tableRouter.route('/getallactive').get(
+    parseJwt('staff', 'kitchen'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const token = req.headers['x-access-token'];
+        tokenVerify(token, (err, data) => {
+            if (data.role === 'kitchen') {
+                tableController.getAllTable(req, true)
+                .then(
+                (response) => {
+                    res.send(response);
+                }
+                )
+                .catch(
+                (error) => {
+                    res.status(error.statusCode).send({
+                        message: error.message
+                    });
+                }
+                );
+            } else {
+                req.query.staffId = data.staff.id;
+                assignmentController.getAssignmentListByStaffId(req)
+                .then((assignments) => {
+                    let response: any = assignments;
+                    response = response.data.assignments.map(item => {
+                        return item.table;
+                    });
+                    response = {
+                        message: 'Get tables successfully.',
+                        data: {
+                            tables: response
+                        }
+                    };
+                    res.send(response);
+                })
+                .catch((error) => {
+                    res.status(error.statusCode).send({
+                        message: error.message
+                    });
+                });
+            }
+        });
     }
 );
 

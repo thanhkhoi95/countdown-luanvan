@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { IError, ISuccess, cryptoUtils, tokenSign } from '../shared';
-import { userDao, staffDao, tableDao, kitchenDao } from '../dao';
+import { userDao, staffDao, tableDao, kitchenDao, convertStaffToResponseObject, convertKitchenToResponseObject } from '../dao';
 import { IUser, IUserModel, IStaff } from '../models';
 import { TableModel } from '../models';
 import config from '../config';
@@ -58,9 +58,8 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                     staff.role = 'staff';
                                     const tokenObject = {
                                         role: 'staff',
-                                        ownerId: staff.id,
                                         userId: user.id,
-                                        username: user.username
+                                        staff: staff
                                     };
                                     const promise = new Promise<ISuccess | IError>((resolve, reject) => {
                                         tokenSign(tokenObject, (err, token) => {
@@ -83,7 +82,9 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                 }
                                 )
                                 .catch(
-                                error => Promise.reject(error)
+                                error => {
+                                    return Promise.reject(error);
+                                }
                                 );
                         } else if (user.role === 'kitchen') {
                             return kitchenDao.getPopulatedKitchenByUserId(user.id)
@@ -98,9 +99,8 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                     kitchen.role = 'kitchen';
                                     const tokenObject = {
                                         role: 'kitchen',
-                                        ownerId: kitchen.id,
                                         userId: user.id,
-                                        username: user.username
+                                        kitchen: kitchen
                                     };
                                     const promise = new Promise<ISuccess | IError>((resolve, reject) => {
                                         tokenSign(tokenObject, (err, token) => {
@@ -112,6 +112,7 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                                     }
                                                 });
                                             } else {
+                                                console.log(4);
                                                 reject({
                                                     statusCode: 500,
                                                     message: 'Internal server error.'
@@ -145,7 +146,7 @@ function login(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function tableLogin(request: express.Request): Promise<ISuccess | IError> {
-    return TableModel.findOne({ name: request.body.name })
+    return TableModel.findOne({ name: request.body.name, active: true })
         .then(
         (table) => {
             if (table) {
@@ -157,7 +158,8 @@ function tableLogin(request: express.Request): Promise<ISuccess | IError> {
                 }
                 const tokenObject = {
                     role: 'table',
-                    name: table.name
+                    name: table.name,
+                    _id: table.id
                 };
                 const promise = new Promise<ISuccess | IError>((resolve, reject) => {
                     tokenSign(tokenObject, (err, token) => {

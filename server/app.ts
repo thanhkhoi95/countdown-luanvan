@@ -4,6 +4,10 @@ import * as express from 'express';
 import * as morgan from 'morgan';
 import * as mongoose from 'mongoose';
 import * as path from 'path';
+import * as socketIO from 'socket.io';
+import * as http from 'http';
+
+import { socketHandler } from './shared';
 
 import {
     userRouter,
@@ -14,12 +18,14 @@ import {
     categoryRouter,
     foodRouter,
     assignmentRouter,
-    imageRouter
+    imageRouter,
+    orderRouter
 } from './routes';
 
 const app = express();
+const server = http.createServer(app);
 dotenv.load({ path: '.env' });
-app.set('port', (process.env.PORT || 4061));
+app.set('port', (process.env.PORT || 6969));
 app.set('baseUri', '/api');
 
 
@@ -37,7 +43,7 @@ app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
     // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type, x-access-token');
 
     // Set to true if you need the website to include cookies in the requests sent
     // to the API (e.g. in case you use sessions)
@@ -71,17 +77,20 @@ db.once('open', () => {
     app.use(`${app.get('baseUri')}/food`, foodRouter);
     app.use(`${app.get('baseUri')}/assignment`, assignmentRouter);
     app.use(`${app.get('baseUri')}/image`, imageRouter);
+    app.use(`${app.get('baseUri')}/order`, orderRouter);
 
     app.get('/*', function(req, res) {
       res.sendFile(path.join(__dirname, '../public/index.html'));
     });
 
+    socketHandler(server);
+
     if (!module.parent) {
-        app.listen(app.get('port'), () => {
+        server.listen(app.get('port'), () => {
             console.log('Luanvan web service listening on port ' + app.get('port'));
         });
     }
 
 });
 
-export { app };
+export { app, server };

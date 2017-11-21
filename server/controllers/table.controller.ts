@@ -28,74 +28,50 @@ function getAllTable(request: express.Request, active?: boolean): Promise<ISucce
             );
     } else {
         return tableDao.getAllTablesActive()
-        .then(
-        (response) => Promise.resolve({
-            message: 'Get all tables successfully.',
-            data: {
-                tables: response
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get all tables successfully.',
+                data: {
+                    tables: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
             }
-        })
-        )
-        .catch(
-        error => {
-            if (!error.statusCode) {
-                return Promise.reject({
-                    statusCode: 500,
-                    message: 'Internal server error.'
-                });
-            } else {
-                return Promise.reject(error);
-            }
-        }
-        );
+            );
     }
 }
 
 function createTable(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.body.username || !request.body.password || !request.body.name) {
+    if (!request.body.name) {
         return Promise.reject({
             statusCode: 400,
             message: 'Data fields missing.'
         });
     }
-    const passwordObject = cryptoUtils.hashWithSalt(request.body.password);
-    const newUser: IUser = {
-        username: request.body.username,
-        password: passwordObject.password,
-        salt: passwordObject.salt,
-        role: 'table'
+    const newTable: ITable = {
+        name: request.body.name,
+        status: 'available',
+        active: true
     };
-    return userDao.insertUser(newUser)
+    return tableDao.insertTable(newTable)
         .then(
-        (responsedUser: IUser) => {
-            const newTable: ITable = {
-                name: request.body.name,
-                active: true
-            };
-            return tableDao.insertTable(newTable)
-                .then(
-                (responsedTable) => {
-                    return Promise.resolve({
-                        message: 'Create new table successfully.',
-                        data: {
-                            table: responsedTable
-                        }
-                    });
+        (responsedTable) => {
+            return Promise.resolve({
+                message: 'Create new table successfully.',
+                data: {
+                    table: responsedTable
                 }
-                )
-                .catch(
-                (error) => {
-                    userDao.deleteUser(responsedUser.username).then(() => { }).catch(() => { });
-                    if (!error.statusCode) {
-                        return Promise.reject({
-                            statusCode: 500,
-                            message: 'Internal server error.'
-                        });
-                    } else {
-                        return Promise.reject(error);
-                    }
-                }
-                );
+            });
         }
         )
         .catch(
@@ -119,6 +95,7 @@ function setActiveTable(request: express.Request): Promise<ISuccess | IError> {
             const table: ITable = {
                 id: request.query.id,
                 name: responsedTable.name,
+                status: responsedTable.status,
                 active: request.query.state
             };
             return tableDao.updateTable(table)
@@ -191,6 +168,56 @@ function updateTable(request: express.Request): Promise<ISuccess | IError> {
             const table: ITable = {
                 id: request.query.id,
                 name: request.body.name || responsedTable.name,
+                status: request.body.status || responsedTable.status,
+                active: responsedTable.active
+            };
+            return tableDao.updateTable(table)
+                .then(
+                (updatedTable) => {
+                    return Promise.resolve({
+                        message: 'Update table successfully.',
+                        data: {
+                            table: updatedTable
+                        }
+                    });
+                }
+                )
+                .catch(
+                (error) => {
+                    if (!error.statusCode) {
+                        return Promise.reject({
+                            statusCode: 500,
+                            message: 'Internal server error.'
+                        });
+                    } else {
+                        return Promise.reject(error);
+                    }
+                }
+                );
+        }
+        )
+        .catch(
+        (error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        }
+        );
+}
+
+function updateStatus(request: express.Request): Promise<ISuccess | IError> {
+    return tableDao.getOriginTable(request.query.id)
+        .then(
+        (responsedTable) => {
+            const table: ITable = {
+                id: request.query.id,
+                name: responsedTable.name,
+                status: request.body.status || responsedTable.status,
                 active: responsedTable.active
             };
             return tableDao.updateTable(table)
@@ -268,5 +295,6 @@ export const tableController = {
     getTable: getTable,
     updateTable: updateTable,
     getTableList: getTableList,
-    getAllTable: getAllTable
+    getAllTable: getAllTable,
+    updateStatus: updateStatus
 };

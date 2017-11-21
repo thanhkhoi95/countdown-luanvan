@@ -66,15 +66,15 @@ export class StaffComponent implements OnInit {
 
     addAssignment() {
         const newAssignment = {
-            staffId: this.staff['id'],
-            tableId: this.addAssignmentForm.value.table
+            staff: this.staff['id'],
+            table: this.addAssignmentForm.value.table
         };
         this.assignmentService.addAssignment(newAssignment).subscribe(
             res => {
                 this.assignments.push(res.data.assignment);
                 this.addAssignmentForm.reset();
                 for (const i in this.tables) {
-                    if (this.tables[i].id === newAssignment.tableId) {
+                    if (this.tables[i].id === newAssignment.table) {
                         this.tables.splice(parseInt(i, 10), 1);
                         break;
                     }
@@ -256,6 +256,7 @@ export class StaffComponent implements OnInit {
         this.staffService.addStaff(formData).subscribe(
             res => {
                 this.getAllStaffs();
+                this.addStaffForm.reset();
                 this.toast.setMessage('Thêm nhân viên mới thành công.', 'success');
             },
             err => console.log(err)
@@ -268,6 +269,7 @@ export class StaffComponent implements OnInit {
             res => {
                 this.isEditing = false;
                 staff.gender = staff.gender === 'true' ? 'Nam' : 'Nữ';
+                staff.birthdate = moment(staff.birthdate).format('DD/MM/YYYY');
                 this.staff = staff;
                 this.toast.setMessage('Chỉnh sửa thông tin nhân viên thành công', 'success');
             },

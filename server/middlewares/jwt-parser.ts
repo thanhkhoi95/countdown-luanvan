@@ -15,7 +15,7 @@ export function parseJwt(...roles: string[]) {
                 } else {
                     for (const i in roles) {
                         if (roles[i] === 'staffEx') {
-                            if (req.query.id !== decoded.ownerId) {
+                            if (req.query.id !== decoded.staff.id) {
                                 res.status(550).json({
                                     message: 'Permission denied'
                                 });
@@ -26,12 +26,13 @@ export function parseJwt(...roles: string[]) {
                             }
                         } else if (roles[i] === decoded.role) {
                             next();
-                        } else {
-                            res.status(550).json({
-                                message: 'Permission denied'
-                            });
+                            return;
                         }
                     }
+                    res.status(550).json({
+                        message: 'Permission denied'
+                    });
+                    return;
                 }
             });
         } else {
