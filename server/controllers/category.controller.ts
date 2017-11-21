@@ -190,7 +190,30 @@ function getCategoryList(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function getAllCategory(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
-    return categoryDao.getAllCategoriesActive()
+    if (!active) {
+        return categoryDao.getAllCategories()
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get categories successfully.',
+                data: {
+                    categories: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
+            }
+            );
+    } else {
+        return categoryDao.getAllCategoriesActive()
         .then(
         (response) => Promise.resolve({
             message: 'Get categories successfully.',
@@ -211,6 +234,7 @@ function getAllCategory(request: express.Request, active?: boolean): Promise<ISu
             }
         }
         );
+    }
 }
 
 export const categoryController = {

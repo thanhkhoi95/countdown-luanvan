@@ -130,10 +130,10 @@ function updateFood(request: express.Request): Promise<ISuccess | IError> {
             }
             if (request.body.pictrues && request.body.pictrues !== '') {
                 request.body.pictrues = request.body.pictures.split(',');
+                request.body.pictures = [...request.body.uploadedImages, ...request.body.pictures];
             } else {
-                request.body.pictrues = [];
+                request.body.pictures = request.body.uploadedImages;
             }
-            request.body.pictures = [...request.body.uploadedImages, ...request.body.pictures];
             for (const img of responsedFood.pictures) {
                 if (request.body.pictures.indexOf(img) < 0) {
                     rollbackUploadedFiles([img]);

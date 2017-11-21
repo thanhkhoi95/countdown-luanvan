@@ -23,9 +23,9 @@
           <td>
             <button class="btn btn-sm btn-warning" (click)="enableEditing(category)">
               <i class="fa fa-pencil"></i> Edit</button>
-            <button *ngIf="!category.active" class="btn btn-sm btn-primary" (click)="activeTable(category)">
+            <button *ngIf="!category.active" class="btn btn-sm btn-primary" (click)="activeCategory(category)">
               <i class="fa fa-trash"></i> Active</button>
-            <button *ngIf="category.active" class="btn btn-sm btn-danger" (click)="deactiveTable(category)">
+            <button *ngIf="category.active" class="btn btn-sm btn-danger" (click)="deactiveCategory(category)">
               <i class="fa fa-trash"></i> Deactive</button>
           </td>
         </tr>

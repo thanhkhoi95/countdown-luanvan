@@ -86,7 +86,6 @@ export class FoodComponent implements OnInit {
         formData.append('name', food.name);
         formData.append('description', food.description);
         formData.append('price', food.price);
-        formData.append('pictures', '');
         formData.append('categories', food.categories[0].id);
         console.log(food);
 
