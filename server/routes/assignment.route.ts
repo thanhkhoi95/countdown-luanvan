@@ -56,6 +56,25 @@ assignmentRouter.route('/staff').get(
     }
 );
 
+assignmentRouter.route('/staffactive').get(
+    // parseJwt('staff'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        assignmentController.getAssignmentListByStaffId(req, true)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
 assignmentRouter.route('/table').get(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         assignmentController.getAssignmentListByTableId(req)

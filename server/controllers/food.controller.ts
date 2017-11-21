@@ -220,8 +220,31 @@ function getFoodList(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function getAllFood(request: express.Request): Promise<ISuccess | IError> {
-    return foodDao.getAllFood()
+function getAllFood(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
+    if (!active) {
+        return foodDao.getAllFood()
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get foods successfully.',
+                data: {
+                    foods: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
+            }
+            );
+    } else {
+        return foodDao.getAllFoodActive()
         .then(
         (response) => Promise.resolve({
             message: 'Get foods successfully.',
@@ -242,6 +265,7 @@ function getAllFood(request: express.Request): Promise<ISuccess | IError> {
             }
         }
         );
+    }
 }
 
 export const foodController = {

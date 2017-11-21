@@ -18,3 +18,19 @@ authRouter.route('/login').post(
             });
     }
 );
+
+authRouter.route('/tablelogin').post(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        authController.tableLogin(req)
+            .then(
+            (response) => {
+                res.send(response);
+            })
+            .catch(
+            (error) => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            });
+    }
+);

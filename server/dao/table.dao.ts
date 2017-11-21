@@ -5,9 +5,7 @@ export function convertTableToResponseObject(table) {
     return {
         name: table.name,
         lowercaseName: table.lowercaseName,
-        username: table.userId.username,
         id: table.id,
-        role: table.role,
         active: table.active
     };
 }
@@ -17,24 +15,11 @@ function getPopulatedTableById(tableId: string): Promise<any> {
         .then(
         (responsedTable) => {
             if (responsedTable) {
-                return responsedTable.populate('userId').execPopulate()
-                    .then(
-                    (populatedTable: ITable) => {
-                        return Promise.resolve(convertTableToResponseObject(populatedTable));
-                    }
-                    )
-                    .catch(
-                    error => {
-                        return Promise.reject({
-                            statusCode: 500,
-                            message: 'Internal server error.'
-                        });
-                    }
-                    );
+                return Promise.resolve(convertTableToResponseObject(responsedTable));
             } else {
                 return Promise.reject({
                     statusCode: 400,
-                    message: 'Staff not found.'
+                    message: 'Table not found.'
                 });
             }
         }
@@ -58,24 +43,11 @@ function getPopulatedTableByUserId(userId: string): Promise<any> {
         .then(
         (responsedTable) => {
             if (responsedTable) {
-                return responsedTable.populate('userId').execPopulate()
-                    .then(
-                    (populatedTable: ITable) => {
-                        return Promise.resolve(convertTableToResponseObject(populatedTable));
-                    }
-                    )
-                    .catch(
-                    error => {
-                        return Promise.reject({
-                            statusCode: 500,
-                            message: 'Internal server error.'
-                        });
-                    }
-                    );
+                return Promise.resolve(convertTableToResponseObject(responsedTable));
             } else {
                 return Promise.reject({
                     statusCode: 400,
-                    message: 'Staff not found.'
+                    message: 'Table not found.'
                 });
             }
         }
@@ -309,6 +281,29 @@ function getAllTables(): Promise<any> {
         );
 }
 
+function getAllTablesActive() {
+    return TableModel.find({ active: true }).sort({ name: 1 })
+        .then(
+        tables => {
+            const response = [];
+            for (const i in tables) {
+                if (tables[i]) {
+                    response[i] = convertTableToResponseObject(tables[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const tableDao = {
     insertTable: insertTable,
     removeTable: removeTable,
@@ -317,5 +312,6 @@ export const tableDao = {
     getPopulatedTableById: getPopulatedTableById,
     getPopulatedTableByUserId: getPopulatedTableByUserId,
     getTableList: getTableList,
-    getAllTables: getAllTables
+    getAllTables: getAllTables,
+    getAllTablesActive: getAllTablesActive
 };

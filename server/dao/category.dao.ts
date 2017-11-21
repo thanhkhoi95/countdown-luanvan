@@ -153,10 +153,28 @@ function getAllCategories(): Promise<any> {
         );
 }
 
+function getAllCategoriesActive(): Promise<any> {
+    return CategoryModel.find({ active: true }).sort({ name: 1 })
+        .then(
+        tables => {
+            return Promise.resolve(tables);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 export const categoryDao = {
     insertCategory: insertCategory,
     updateCategory: updateCategory,
     getCategory: getCategory,
     getCategoryList: getCategoryList,
-    getAllCategories: getAllCategories
+    getAllCategories: getAllCategories,
+    getAllCategoriesActive: getAllCategoriesActive
 };

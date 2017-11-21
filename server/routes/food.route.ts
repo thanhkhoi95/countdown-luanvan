@@ -118,3 +118,21 @@ foodRouter.route('/getall').get(
             );
     }
 );
+
+foodRouter.route('/getallactive').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        foodController.getAllFood(req, true)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+)

@@ -18,9 +18,6 @@ export class TableComponent implements OnInit {
 
     addTableForm: FormGroup;
     name = new FormControl('', Validators.required);
-    username = new FormControl('', Validators.required);
-    password = new FormControl('', Validators.required);
-    passwordConfirm = new FormControl('', Validators.required);
 
     constructor(private tablesService: TableService,
         private formBuilder: FormBuilder,
@@ -30,22 +27,7 @@ export class TableComponent implements OnInit {
         this.getAllTables();
         this.addTableForm = this.formBuilder.group({
             name: this.name,
-            username: this.username,
-            password: this.password,
-            passwordConfirm: this.passwordConfirm
-        }, { validator: this.checkIfMatchingPasswords('password', 'passwordConfirm') });
-    }
-
-    private checkIfMatchingPasswords(pass: string, confirm: string) {
-        return (group: FormGroup) => {
-            const passwordInput = group.controls[pass],
-                passwordConfirmationInput = group.controls[confirm];
-            if (passwordInput.value !== passwordConfirmationInput.value) {
-                return passwordConfirmationInput.setErrors({ notEquivalent: true });
-            } else {
-                return passwordConfirmationInput.setErrors(null);
-            }
-        };
+        });
     }
 
     getAllTables() {

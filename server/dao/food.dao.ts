@@ -200,7 +200,7 @@ function getFoodList(pageIndex: number, pageSize: number): Promise<any> {
     return FoodModel.count({})
         .then(
         (count: number) => {
-            return FoodModel.find({}).sort({ firstname: -1 })
+            return FoodModel.find({}).sort({ name: -1 })
                 .skip((pageIndex > 0) ? (pageIndex - 1) * pageSize : 0)
                 .limit(pageSize)
                 .populate({
@@ -239,7 +239,34 @@ function getFoodList(pageIndex: number, pageSize: number): Promise<any> {
 }
 
 function getAllFood(): Promise<any> {
-    return FoodModel.find({}).sort({ firstname: -1 })
+    return FoodModel.find({}).sort({ name: -1 })
+        .populate({
+            path: 'categories',
+            model: 'category'
+        })
+        .then(
+        foods => {
+            const response = [];
+            for (const i in foods) {
+                if (foods[i]) {
+                    response[i] = convertToResponseObject(foods[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
+function getAllFoodActive(): Promise<any> {
+    return FoodModel.find({ active: true }).sort({ name: 1 })
         .populate({
             path: 'categories',
             model: 'category'
@@ -271,5 +298,6 @@ export const foodDao = {
     getOriginFood: getOriginFood,
     getPopulatedFoodById: getPopulatedFoodById,
     getFoodList: getFoodList,
-    getAllFood: getAllFood
+    getAllFood: getAllFood,
+    getAllFoodActive: getAllFoodActive
 };

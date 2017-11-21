@@ -111,28 +111,52 @@ function updateAssignment(request: express.Request): Promise<ISuccess | IError> 
         );
 }
 
-function getAssignmentListByStaffId(request: express.Request): Promise<ISuccess | IError> {
-    return assignmentDao.getAssignmentListByStaffId(request.query.staffId)
-        .then(
-        (response) => Promise.resolve({
-            message: 'Get assignments successfully.',
-            data: {
-                assignments: response
+function getAssignmentListByStaffId(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
+    if (!active) {
+        return assignmentDao.getAssignmentListByStaffId(request.query.staffId)
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get assignments successfully.',
+                data: {
+                    assignments: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
             }
-        })
-        )
-        .catch(
-        error => {
-            if (!error.statusCode) {
-                return Promise.reject({
-                    statusCode: 500,
-                    message: 'Internal server error.'
-                });
-            } else {
-                return Promise.reject(error);
+            );
+    } else {
+        return assignmentDao.getAssignmentActiveListByStaffId(request.query.id)
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get assignments successfully.',
+                data: {
+                    assignments: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
             }
-        }
-        );
+            );
+    }
 }
 
 function getAssignmentListByTableId(request: express.Request): Promise<ISuccess | IError> {

@@ -117,6 +117,24 @@ categoryRouter.route('/getall').get(
     }
 );
 
+categoryRouter.route('/getallactive').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        categoryController.getAllCategory(req, true)
+            .then(
+            response => {
+                res.send(response);
+            }
+            )
+            .catch(
+            error => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
 // categoryRouter.route('/').delete((req: express.Request, res: express.Response, next: express.NextFunction) => {
 //     categoryController.deleteCategory(req)
 //         .then(

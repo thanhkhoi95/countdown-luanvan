@@ -5,7 +5,6 @@ export interface ITable {
     id?: string;
     name: string;
     lowercaseName?: string;
-    userId: string;
     active: boolean;
 }
 
@@ -20,12 +19,6 @@ const tableSchema = new mongoose.Schema(
         },
         lowercaseName: {
             type: String
-        },
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'user',
-            required: true,
-            unique: true
         },
         active: {
             type: Boolean,

@@ -3,8 +3,31 @@ import { IError, ISuccess, cryptoUtils } from '../shared';
 import { userDao, tableDao } from '../dao';
 import { IUser, IUserModel, ITable } from '../models';
 
-function getAllTable(request: express.Request): Promise<ISuccess | IError> {
-    return tableDao.getAllTables()
+function getAllTable(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
+    if (!active) {
+        return tableDao.getAllTables()
+            .then(
+            (response) => Promise.resolve({
+                message: 'Get all tables successfully.',
+                data: {
+                    tables: response
+                }
+            })
+            )
+            .catch(
+            error => {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                } else {
+                    return Promise.reject(error);
+                }
+            }
+            );
+    } else {
+        return tableDao.getAllTablesActive()
         .then(
         (response) => Promise.resolve({
             message: 'Get all tables successfully.',
@@ -25,6 +48,7 @@ function getAllTable(request: express.Request): Promise<ISuccess | IError> {
             }
         }
         );
+    }
 }
 
 function createTable(request: express.Request): Promise<ISuccess | IError> {
@@ -46,7 +70,6 @@ function createTable(request: express.Request): Promise<ISuccess | IError> {
         (responsedUser: IUser) => {
             const newTable: ITable = {
                 name: request.body.name,
-                userId: responsedUser.id,
                 active: true
             };
             return tableDao.insertTable(newTable)
@@ -96,7 +119,6 @@ function setActiveTable(request: express.Request): Promise<ISuccess | IError> {
             const table: ITable = {
                 id: request.query.id,
                 name: responsedTable.name,
-                userId: responsedTable.userId,
                 active: request.query.state
             };
             return tableDao.updateTable(table)
@@ -169,7 +191,6 @@ function updateTable(request: express.Request): Promise<ISuccess | IError> {
             const table: ITable = {
                 id: request.query.id,
                 name: request.body.name || responsedTable.name,
-                userId: responsedTable.userId,
                 active: responsedTable.active
             };
             return tableDao.updateTable(table)

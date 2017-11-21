@@ -20,12 +20,9 @@ export interface IOrderModel extends IOrder, mongoose.Document { }
 const orderSchema = new mongoose.Schema(
     {
         foods: [{
-            foodId: {
+            food: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'food'
-            },
-            name: {
-                type: String
             },
             price: {
                 type: Number
@@ -37,9 +34,6 @@ const orderSchema = new mongoose.Schema(
         tableId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
-        },
-        clientName: {
-            type: String
         },
         date: {
             type: Date

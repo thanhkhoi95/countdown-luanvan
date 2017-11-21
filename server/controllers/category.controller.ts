@@ -189,8 +189,8 @@ function getCategoryList(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function getAllCategory(request: express.Request): Promise<ISuccess | IError> {
-    return categoryDao.getAllCategories()
+function getAllCategory(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
+    return categoryDao.getAllCategoriesActive()
         .then(
         (response) => Promise.resolve({
             message: 'Get categories successfully.',

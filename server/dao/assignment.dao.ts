@@ -68,6 +68,30 @@ function getAssignmentById(assignmentId: string): Promise<any> {
 }
 
 function getAssignmentListByStaffId(staffId: string): Promise<any> {
+    return AssignmentModel.find({ staffId: staffId })
+        .populate('staffId').populate('tableId')
+        .then(
+        assignments => {
+            const data = [];
+            for (const i in assignments) {
+                if (assignments[i]) {
+                    data[i] = convertToResponseObject(assignments[i]);
+                }
+            }
+            return Promise.resolve(data);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
+function getAssignmentActiveListByStaffId(staffId: string): Promise<any> {
     console.log(staffId);
     return AssignmentModel.find({ staffId: staffId })
         .populate('staffId').populate('tableId')
@@ -75,9 +99,14 @@ function getAssignmentListByStaffId(staffId: string): Promise<any> {
         assignments => {
             console.log(assignments);
             const data = [];
-            for (const i in assignments) {
+            for (let i = 0; i < assignments.length; i++) {
                 if (assignments[i]) {
                     data[i] = convertToResponseObject(assignments[i]);
+                    if (data[i].table.active === false) {
+                        assignments.splice(i, 1);
+                        data.splice(i, 1);
+                        i--;
+                    }
                 }
             }
             return Promise.resolve(data);
@@ -213,6 +242,7 @@ export const assignmentDao = {
     insertAssignment: insertAssignment,
     getAssignmentById: getAssignmentById,
     getAssignmentListByStaffId: getAssignmentListByStaffId,
+    getAssignmentActiveListByStaffId: getAssignmentActiveListByStaffId,
     getAssignmentListByTableId: getAssignmentListByTableId,
     updateAssignment: updateAssignment,
     deleteAssignment: deleteAssignment,

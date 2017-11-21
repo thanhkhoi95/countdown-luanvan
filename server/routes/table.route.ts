@@ -4,6 +4,24 @@ import { parseJwt } from '../middlewares';
 
 export const tableRouter = express.Router();
 
+tableRouter.route('/getallactive').get(
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        tableController.getAllTable(req, true)
+            .then(
+            (response) => {
+                res.send(response);
+            }
+            )
+            .catch(
+            (error) => {
+                res.status(error.statusCode).send({
+                    message: error.message
+                });
+            }
+            );
+    }
+);
+
 tableRouter.route('/getall').get(
     parseJwt('admin'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
