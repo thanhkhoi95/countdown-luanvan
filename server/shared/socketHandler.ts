@@ -66,6 +66,11 @@ export function socketHandler(server) {
             socket.to(data.table.id).emit('order:update', data);
         });
 
+        socket.on('order:checkout', data => {
+            console.log('Oder update: ', data);
+            socket.to(data.table.id).emit('order:checkout', data);
+        });
+
         socket.on('table:update', data => {
             console.log('Table update: ', data);
             console.log('Room: ', data._id);

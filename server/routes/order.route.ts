@@ -95,3 +95,16 @@ orderRouter.route('/').get(
         });
     }
 );
+
+orderRouter.route('/newest').get(
+    parseJwt('staff', 'kitchen'),
+    (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        orderController.getNewestOrderByTableId(req)
+        .then((response) => {
+            res.send(response);
+        })
+        .catch((error) => {
+            res.status(error.statusCode).send(error);
+        });
+    }
+);

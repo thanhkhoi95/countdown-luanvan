@@ -146,7 +146,7 @@ function login(request: express.Request): Promise<ISuccess | IError> {
 }
 
 function tableLogin(request: express.Request): Promise<ISuccess | IError> {
-    return TableModel.findOne({ name: request.body.name, active: true })
+    return TableModel.findOne({ name: request.body.name })
         .then(
         (table) => {
             if (table) {
@@ -154,6 +154,12 @@ function tableLogin(request: express.Request): Promise<ISuccess | IError> {
                     return Promise.reject({
                         statusCode: 400,
                         message: 'Wrong table id.'
+                    });
+                }
+                if (table.status !== 'available') {
+                    return Promise.reject({
+                        statusCode: 400,
+                        message: 'Table not available.'
                     });
                 }
                 const tokenObject = {
