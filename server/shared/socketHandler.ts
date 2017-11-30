@@ -32,7 +32,7 @@ export function socketHandler(server) {
                             const rooms = response.map(t => {
                                 return t.id;
                             });
-                            console.log('Rooms kitchen:' ,rooms);
+                            console.log('Rooms kitchen:', rooms);
                             socket.join(rooms, () => {
                                 init(socket);
                             });
