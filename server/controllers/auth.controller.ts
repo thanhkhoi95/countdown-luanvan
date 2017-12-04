@@ -170,9 +170,12 @@ function tableLogin(request: express.Request): Promise<ISuccess | IError> {
                 const promise = new Promise<ISuccess | IError>((resolve, reject) => {
                     tokenSign(tokenObject, (err, token) => {
                         if (!err) {
+                            table.status = 'serving';
+                            tableDao.updateTable(table).catch(() => {});
                             resolve({
                                 message: 'Login successfully.',
                                 data: {
+                                    table: table,
                                     token: token
                                 }
                             });
@@ -196,7 +199,6 @@ function tableLogin(request: express.Request): Promise<ISuccess | IError> {
         .catch(
         error => Promise.reject(error)
         );
-
 }
 
 export const authController = {
