@@ -280,23 +280,22 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
 function getNewestOrderByTableId(req: express.Request): Promise<ISuccess | IError> {
     return tableDao.getOriginTable(req.query.tableid)
         .then((table) => {
-            if (table && table.status === 'serving') {
-                return orderDao.getAllOrders()
-                    .then((orders) => {
-                        orders.sort((a, b) => {
-                            return b.date - a.date;
-                        });
-                        return Promise.resolve({
-                            message: 'Get order successfully.',
-                            data: {
-                                order: orders[0]
-                            }
-                        });
-                    })
-                    .catch((error) => {
-                        return Promise.reject(error);
+            return orderDao.getOrderByTable(table.id)
+                .then((orders) => {
+                    orders.sort((a, b) => {
+                        return b.date - a.date;
                     });
-            }
+                    console.log(orders[0]);
+                    return Promise.resolve({
+                        message: 'Get order successfully.',
+                        data: {
+                            order: orders[0]
+                        }
+                    });
+                })
+                .catch((error) => {
+                    return Promise.reject(error);
+                });
         })
         .catch(error => Promise.reject(error));
 }

@@ -130,10 +130,28 @@ function getOriginOrderById(orderId: string): Promise<any> {
         });
 }
 
+function getOrderByTable(tableId: string): Promise<any> {
+    return OrderModel.find({ table: tableId }).populate('foods.food').populate('table')
+        .then((orders) => {
+            return Promise.resolve(orders);
+        })
+        .catch((error) => {
+            if (!error.statusCode) {
+                return Promise.reject({
+                    statusCode: 500,
+                    message: 'Internal server error.'
+                });
+            } else {
+                return Promise.reject(error);
+            }
+        });
+}
+
 export const orderDao = {
     getAllOrders: getAllOrders,
     createOrder: createOrder,
     updateOrder: updateOrder,
     getOrderById: getOrderById,
-    getOriginOrderById: getOriginOrderById
+    getOriginOrderById: getOriginOrderById,
+    getOrderByTable: getOrderByTable
 };
