@@ -171,7 +171,8 @@ function tableLogin(request: express.Request): Promise<ISuccess | IError> {
                     tokenSign(tokenObject, (err, token) => {
                         if (!err) {
                             table.status = 'serving';
-                            tableDao.updateTable(table).catch(() => {});
+                            console.log(table);
+                            tableDao.updateTable(table).catch((error) => console.log(error));
                             resolve({
                                 message: 'Login successfully.',
                                 data: {
