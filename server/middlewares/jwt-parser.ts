@@ -13,6 +13,7 @@ export function parseJwt(...roles: string[]) {
                 } else if (roles.indexOf('admin') > -1 && decoded.role === 'admin') {
                     next();
                 } else {
+                    req.body.authInfo = decoded;
                     for (const i in roles) {
                         if (roles[i] === 'staffEx') {
                             if (req.query.id !== decoded.staff.id) {

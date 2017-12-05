@@ -150,6 +150,16 @@ function changeTable(request: express.Request): Promise<ISuccess | IError> {
 function addMoreFood(request: express.Request): Promise<ISuccess | IError> {
     return orderDao.getOriginOrderById(request.query.id)
         .then((responsedOrder) => {
+            if (request.body.authInfo.role === 'table') {
+                console.log(request.body);
+                console.log(responsedOrder);
+                if (responsedOrder.table.toString() !== request.body.authInfo._id) {
+                    return Promise.reject({
+                        statusCode: 550,
+                        message: 'Permission denied'
+                    });
+                }
+            }
             const processes: Promise<any>[] = request.body.foods.map(item => {
                 return foodDao.getOriginFood(item.food).then(responsedFood => {
                     item.price = responsedFood.price;
@@ -235,6 +245,7 @@ function changeOrderStatus(request: express.Request): Promise<ISuccess | IError>
 }
 
 function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> {
+    console.log(request.body);
     return orderDao.getOriginOrderById(request.query.id)
         .then((responsedOrder) => {
             console.log(responsedOrder);
