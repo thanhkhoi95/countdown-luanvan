@@ -190,14 +190,8 @@ function updateKitchen(request: express.Request): Promise<ISuccess | IError> {
         );
 }
 
-function getKitchenList(request: express.Request): Promise<ISuccess | IError> {
-    if (!request.query.pageindex) {
-        request.query.pageindex = '1';
-    }
-    if (!request.query.pagesize) {
-        request.query.pagesize = '20';
-    }
-    return kitchenDao.getAllKitchens(parseInt(request.query.pageindex, 10), parseInt(request.query.pagesize, 10))
+function getAllKitchens(request: express.Request): Promise<ISuccess | IError> {
+    return kitchenDao.getAllKitchens()
     .then(
         (response) => Promise.resolve({
             message: 'Get kitchens successfully.',
@@ -225,5 +219,5 @@ export const kitchenController = {
     setActiveKitchen: setActiveKitchen,
     getKitchen: getKitchen,
     updateKitchen: updateKitchen,
-    getKitchenList: getKitchenList
+    getAllKitchens: getAllKitchens
 };

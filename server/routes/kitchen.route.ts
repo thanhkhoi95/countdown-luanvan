@@ -81,7 +81,7 @@ kitchenRouter.route('/').put(
 
 kitchenRouter.route('/getAll').get(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    kitchenController.getKitchenList(req)
+    kitchenController.getAllKitchen(req)
         .then(
         response => {
             res.send(response);

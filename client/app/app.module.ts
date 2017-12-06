@@ -12,6 +12,7 @@ import { StaffService } from './services/staff.service';
 import { CategoryService } from './services/category.service';
 import { FoodService } from './services/food.service';
 import { AssignmentService } from './services/assignment.service';
+import { KitchenService } from './services/kitchen.service';
 
 import { AuthGuardLogin } from './services/auth-guard-login.service';
 import { AuthGuardAdmin } from './services/auth-guard-admin.service';
@@ -27,6 +28,7 @@ import { TableComponent } from './table/table.component';
 import { StaffComponent } from './staff/staff.component';
 import { CategoryComponent } from './category/category.component';
 import { FoodComponent } from './food/food.component';
+import { KitchenComponent } from './kitchen/kitchen.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +41,8 @@ import { FoodComponent } from './food/food.component';
     TableComponent,
     StaffComponent,
     CategoryComponent,
-    FoodComponent
+    FoodComponent,
+    KitchenComponent
   ],
   imports: [
     RoutingModule,
@@ -56,7 +59,8 @@ import { FoodComponent } from './food/food.component';
     StaffService,
     CategoryService,
     FoodService,
-    AssignmentService
+    AssignmentService,
+    KitchenService
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   bootstrap: [AppComponent]

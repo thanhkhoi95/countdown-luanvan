@@ -246,7 +246,7 @@ function updateKitchen(kitchen: IKitchen): Promise<any> {
         );
 }
 
-function getAllKitchens(pageIndex: number, pageSize: number): Promise<any> {
+function getKitchenList(pageIndex: number, pageSize: number): Promise<any> {
     return KitchenModel.count({})
         .then(
         (count: number) => {
@@ -284,6 +284,31 @@ function getAllKitchens(pageIndex: number, pageSize: number): Promise<any> {
         }
         );
 }
+
+function getAllKitchens(): Promise<any> {
+    return KitchenModel.find({}).sort({ name: -1 })
+        .populate('userId')
+        .then(
+        kitchens => {
+            const response = [];
+            for (const i in kitchens) {
+                if (kitchens[i]) {
+                    response[i] = convertKitchenToResponseObject(kitchens[i]);
+                }
+            }
+            return Promise.resolve(response);
+        }
+        )
+        .catch(
+        error => {
+            return Promise.reject({
+                statusCode: 500,
+                message: 'Internal server error.'
+            });
+        }
+        );
+}
+
 
 export const kitchenDao = {
     insertKitchen: insertKitchen,

@@ -14,6 +14,7 @@ import { FoodComponent } from './food/food.component';
 import { AuthGuardLogin } from './services/auth-guard-login.service';
 import { AuthGuardAdmin } from './services/auth-guard-admin.service';
 import { AuthGuardLayout } from './services/auth-guard-layout.service';
+import { KitchenComponent } from './kitchen/kitchen.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginComponent, canActivate: [AuthGuardLogin] },
@@ -26,7 +27,8 @@ const routes: Routes = [
       { path: 'table', component: TableComponent, canActivate: [AuthGuardAdmin] },
       { path: 'staff', component: StaffComponent, canActivate: [AuthGuardAdmin] },
       { path: 'category', component: CategoryComponent, canActivate: [AuthGuardAdmin]},
-      { path: 'food', component: FoodComponent, canActivate: [AuthGuardAdmin]}
+      { path: 'food', component: FoodComponent, canActivate: [AuthGuardAdmin]},
+      { path: 'kitchen', component: KitchenComponent, canActivate: [AuthGuardAdmin]},
     ],
     canActivate: [AuthGuardLayout]
   },

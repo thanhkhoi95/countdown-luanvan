@@ -6,7 +6,10 @@
                 <i class="fa fa-lock"></i> Admin
             </a>
             <a routerLink="/home/table" class="nav-item nav-link" routerLinkActive="active" *ngIf="auth.loggedIn && auth.isAdmin">
-                <i class="fa fa-list"></i> Bàn ăn
+                <i class="fa fa-list"></i> Bà   n ăn
+            </a>
+            <a routerLink="/home/kitchen" class="nav-item nav-link" routerLinkActive="active" *ngIf="auth.loggedIn && auth.isAdmin">
+                <i class="fa fa-fire"></i> Nhà bếp
             </a>
             <a routerLink="/home/staff" class="nav-item nav-link" routerLinkActive="active" *ngIf="auth.loggedIn && auth.isAdmin">
                 <i class="fa fa-user"></i> Nhân viên
