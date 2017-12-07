@@ -77,6 +77,10 @@ export function socketHandler(server) {
             socket.to(data._id).emit('table:update', data);
         });
 
+        socket.on('table:support', data => {
+            socket.to(data._id).emit('table:support', data);
+        });
+
         socket.on('disconnect', () => {
             console.log(`${socket.id} has been disconnected.`);
         });
