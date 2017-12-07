@@ -27,7 +27,7 @@ tableRouter.route('/updatestatus').put(
 tableRouter.route('/getallactive').get(
     parseJwt('staff', 'kitchen'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const token: string = req.headers['x-access-token'];
+        const token: string = req.headers['x-access-token'].toString();
         tokenVerify(token, (err, data) => {
             if (data.role === 'kitchen') {
                 tableController.getAllTable(req, true)
