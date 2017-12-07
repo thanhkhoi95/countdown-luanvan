@@ -54,7 +54,8 @@
     "socket.io": "^2.0.4",
     "tether": "1.4.0",
     "uid": "0.0.2",
-    "zone.js": "^0.8.14"
+    "zone.js": "^0.8.14",
+    "typescript": "~2.3.3"
   },
   "devDependencies": {
     "@angular/cli": "1.4.7",
@@ -83,7 +84,6 @@
     "nodemon": "1.11.0",
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
-    "tslint": "~5.7.0",
-    "typescript": "~2.3.3"
+    "tslint": "~5.7.0"
   }
 }
