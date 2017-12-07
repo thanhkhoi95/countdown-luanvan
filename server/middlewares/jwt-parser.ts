@@ -3,7 +3,7 @@ import { tokenVerify } from '../shared';
 
 export function parseJwt(...roles: string[]) {
     return function (req: express.Request, res: express.Response, next: express.NextFunction) {
-        const token = req.headers['x-access-token'];
+        const token: string = req.headers['x-access-token'];
         if (token) {
             tokenVerify(token, (err, decoded) => {
                 if (err) {
