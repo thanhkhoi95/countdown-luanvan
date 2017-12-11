@@ -2,6 +2,7 @@ import * as express from 'express';
 import { IError, ISuccess, cryptoUtils } from '../shared';
 import { userDao, tableDao } from '../dao';
 import { IUser, IUserModel, ITable } from '../models';
+import { orderController } from '../controllers';
 
 function getAllTable(request: express.Request, active?: boolean): Promise<ISuccess | IError> {
     if (!active) {
@@ -220,19 +221,40 @@ function updateStatus(request: express.Request): Promise<ISuccess | IError> {
                 status: request.body.status || responsedTable.status,
                 active: responsedTable.active
             };
-            return tableDao.updateTable(table)
-                .then(
-                (updatedTable) => {
-                    return Promise.resolve({
-                        message: 'Update table successfully.',
-                        data: {
-                            table: updatedTable
+            request.query.tableid = request.query.id;
+            return orderController.getNewestOrderByTableId(request)
+                .then((res) => {
+                    // if (res['data'].order && res['data'].order.status === 'serving') {
+                    //     return Promise.reject({
+                    //         statusCode: 550,
+                    //         message: 'Permission denied'
+                    //     });
+                    // }
+                    return tableDao.updateTable(table)
+                        .then(
+                        (updatedTable) => {
+                            return Promise.resolve({
+                                message: 'Update table successfully.',
+                                data: {
+                                    table: updatedTable
+                                }
+                            });
                         }
-                    });
-                }
-                )
-                .catch(
-                (error) => {
+                        )
+                        .catch(
+                        (error) => {
+                            if (!error.statusCode) {
+                                return Promise.reject({
+                                    statusCode: 500,
+                                    message: 'Internal server error.'
+                                });
+                            } else {
+                                return Promise.reject(error);
+                            }
+                        }
+                        );
+                })
+                .catch((error) => {
                     if (!error.statusCode) {
                         return Promise.reject({
                             statusCode: 500,
@@ -241,8 +263,7 @@ function updateStatus(request: express.Request): Promise<ISuccess | IError> {
                     } else {
                         return Promise.reject(error);
                     }
-                }
-                );
+                });
         }
         )
         .catch(

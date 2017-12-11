@@ -7,6 +7,7 @@ export const tableRouter = express.Router();
 
 
 tableRouter.route('/updatestatus').put(
+    parseJwt('staff', 'table'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         tableController.updateStatus(req)
             .then(

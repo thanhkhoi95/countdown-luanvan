@@ -204,12 +204,18 @@ function addMoreFood(request: express.Request): Promise<ISuccess | IError> {
 function changeOrderStatus(request: express.Request): Promise<ISuccess | IError> {
     return orderDao.getOriginOrderById(request.query.id)
         .then((responsedOrder) => {
+            if (responsedOrder.status === 'checked out') {
+                return Promise.reject({
+                    statusCode: 550,
+                    message: 'Permission denied'
+                });
+            }
             const order: IOrder = {
                 id: request.query.id,
                 foods: responsedOrder.foods,
                 table: responsedOrder.table,
                 date: responsedOrder.date,
-                status: request.body.status || request.body.status
+                status: request.body.status
             };
             if (order.status === 'checked out') {
                 tableDao.getOriginTable(order.table).then(
@@ -218,6 +224,7 @@ function changeOrderStatus(request: express.Request): Promise<ISuccess | IError>
                         table.save().then(() => { }).catch(err => console.log(err));
                     }
                 ).catch((err) => console.log(err));
+                order.staff = request.body.authInfo.staff.id;
             }
             return orderDao.updateOrder(order)
                 .then((response) => {
@@ -248,7 +255,6 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
     console.log(request.body);
     return orderDao.getOriginOrderById(request.query.id)
         .then((responsedOrder) => {
-            console.log(responsedOrder);
             const order: IOrder = {
                 id: request.query.id,
                 foods: responsedOrder.foods,
@@ -258,11 +264,109 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
             };
             for (const i in order.foods) {
                 if (order.foods[i].uid === request.body.uid) {
+                    if (request.body.status === 'delivered') {
+                        console.log(order.foods[i]);
+                        if (order.foods[i].status !== 'done') {
+                            console.log('---2');
+                            return Promise.reject({
+                                statusCode: 550,
+                                message: 'Permission denied'
+                            });
+                        }
+                        if (!request.body.authInfo.staff) {
+                            return Promise.reject({
+                                statusCode: 550,
+                                message: 'Permission denied'
+                            });
+                        }
+                    } else
+                        if (request.body.status === 'done') {
+                            console.log(order.foods[i]);
+                            if (request.body.authInfo.staff) {
+                                if (request.body.authInfo.staff.id !== order.foods[i].staff.toString() &&
+                                    order.foods[i].status === 'delivered') {
+                                        console.log(1);
+                                    return Promise.reject({
+                                        statusCode: 550,
+                                        message: 'Permission denied'
+                                    });
+                                }
+                            }
+                            if (request.body.authInfo.kitchen) {
+                                console.log(2);
+                                if (order.foods[i].status === 'cocking' &&
+                                    order.foods[i].kitchen.toString() !== request.body.authInfo.kitchen.id) {
+                                        console.log(3);
+                                    return Promise.reject({
+                                        statusCode: 550,
+                                        message: 'Permission denied'
+                                    });
+                                }
+                                if (order.foods[i].status === 'delivered') {
+                                    console.log(4);
+                                    return Promise.reject({
+                                        statusCode: 550,
+                                        message: 'Permission denied'
+                                    });
+                                }
+                            }
+                        } else
+                            if (request.body.status === 'cocking') {
+                                if (request.body.authInfo.staff) {
+                                    return Promise.reject({
+                                        statusCode: 550,
+                                        message: 'Permission denied'
+                                    });
+                                }
+                                if (request.body.authInfo.kitchen) {
+                                    if (order.foods[i].status === 'done' &&
+                                        order.foods[i].kitchen.toString() !== request.body.authInfo.kitchen.id) {
+                                        return Promise.reject({
+                                            statusCode: 550,
+                                            message: 'Permission denied'
+                                        });
+                                    }
+                                    if (order.foods[i].status === 'delivered') {
+                                        console.log('---4');
+                                        return Promise.reject({
+                                            statusCode: 550,
+                                            message: 'Permission denied'
+                                        });
+                                    }
+                                }
+                            } else
+                                if (request.body.status === 'ordered') {
+                                    if (request.body.authInfo.staff) {
+                                        return Promise.reject({
+                                            statusCode: 550,
+                                            message: 'Permission denied'
+                                        });
+                                    }
+                                    if (request.body.authInfo.kitchen) {
+                                        if (order.foods[i].status === 'delivered' &&
+                                            order.foods[i].kitchen.toString() !== request.body.authInfo.kitchen.id) {
+                                            return Promise.reject({
+                                                statusCode: 550,
+                                                message: 'Permission denied'
+                                            });
+                                        }
+                                    }
+                                } else {
+                                    return Promise.reject({
+                                        statusCode: 400,
+                                        message: 'Invalid status'
+                                    });
+                                }
                     order.foods[i].status = request.body.status;
+                    if (request.body.authInfo.kitchen) {
+                        order.foods[i].kitchen = request.body.authInfo.kitchen.id;
+                    }
+                    if (request.body.authInfo.staff) {
+                        order.foods[i].staff = request.body.authInfo.staff.id;
+                    }
                     break;
                 }
             }
-            console.log(order);
             return orderDao.updateOrder(order)
                 .then((response) => {
                     return Promise.resolve({
@@ -289,26 +393,38 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
 }
 
 function getNewestOrderByTableId(req: express.Request): Promise<ISuccess | IError> {
-    return tableDao.getOriginTable(req.query.tableid)
-        .then((table) => {
-            return orderDao.getOrderByTable(table.id)
-                .then((orders) => {
-                    orders.sort((a, b) => {
-                        return b.date - a.date;
-                    });
-                    console.log(orders[0]);
+    return orderDao.getOrderByTable(req.query.tableid)
+        .then((orders) => {
+            if (orders.length > 0) {
+                orders.sort((a, b) => {
+                    return b.date - a.date;
+                });
+                if (orders[0].status === 'checked out') {
                     return Promise.resolve({
                         message: 'Get order successfully.',
                         data: {
-                            order: orders[0]
+                            order: null
                         }
                     });
-                })
-                .catch((error) => {
-                    return Promise.reject(error);
+                }
+                return Promise.resolve({
+                    message: 'Get order successfully.',
+                    data: {
+                        order: orders[0]
+                    }
                 });
+            } else {
+                return Promise.resolve({
+                    message: 'Get order successfully.',
+                    data: {
+                        order: null
+                    }
+                });
+            }
         })
-        .catch(error => Promise.reject(error));
+        .catch((error) => {
+            return Promise.reject(error);
+        });
 }
 
 export const orderController = {

@@ -5,7 +5,9 @@ interface FoodRef {
     price: number;
     quantity: number;
     uid: string;
-    status: String;
+    status: string;
+    kitchen?: string;
+    staff?: string;
 }
 
 export interface IOrder {
@@ -14,6 +16,7 @@ export interface IOrder {
     table: string;
     date: Date;
     status: String;
+    staff?: string;
 }
 
 export interface IOrderModel extends IOrder, mongoose.Document { }
@@ -38,10 +41,22 @@ const orderSchema = new mongoose.Schema(
             status: {
                 type: String
             },
+            kitchen: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'kitchen'
+            },
+            staff: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'staff'
+            }
         }],
         table: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
+        },
+        staff: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'staff'
         },
         date: {
             type: Date

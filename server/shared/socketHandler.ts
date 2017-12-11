@@ -4,7 +4,6 @@ import { assignmentDao, tableDao } from '../dao';
 
 export function socketHandler(server) {
     const io = socketIO(server);
-
     io.on('connection', socket => {
         console.log(`${socket.id} is connected`);
         const token = socket.handshake.query.token;
@@ -15,7 +14,6 @@ export function socketHandler(server) {
                 if (data.role === 'staff') {
                     assignmentDao.getAssignmentListByStaffId(data.staff.id)
                         .then((response) => {
-
                             const rooms = response.map(r => {
                                 return r.table.id;
                             });

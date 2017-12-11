@@ -56,6 +56,7 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                         });
                                     }
                                     staff.role = 'staff';
+                                    staff._id = staff.id;
                                     const tokenObject = {
                                         role: 'staff',
                                         userId: user.id,
@@ -97,6 +98,7 @@ function login(request: express.Request): Promise<ISuccess | IError> {
                                         });
                                     }
                                     kitchen.role = 'kitchen';
+                                    kitchen._id = kitchen.id;
                                     const tokenObject = {
                                         role: 'kitchen',
                                         userId: user.id,

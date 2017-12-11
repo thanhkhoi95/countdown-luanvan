@@ -1,7 +1,10 @@
 import { OrderModel, IOrder, IOrderModel } from '../models';
 
 function getAllOrders(): Promise<any> {
-    return OrderModel.find({}).populate('foods.food').populate('table')
+    return OrderModel.find({}).populate('foods.food')
+        .populate('foods.kitchen')
+        .populate('foods.staff')
+        .populate('table')
         .then((orders) => {
             return Promise.resolve(orders);
         })
@@ -17,7 +20,11 @@ function createOrder(order: IOrder): Promise<any> {
     const newOrder = new OrderModel(order);
     return newOrder.save()
         .then((responsedOrder) => {
-            return responsedOrder.populate('foods.food').populate('table').execPopulate()
+            return responsedOrder.populate('foods.food')
+                .populate('foods.kitchen')
+                .populate('foods.staff')
+                .populate('table')
+                .execPopulate()
                 .then((populatedOrder) => {
                     return Promise.resolve(populatedOrder);
                 })
@@ -46,7 +53,11 @@ function updateOrder(order: IOrder): Promise<any> {
             return responsedOrder.save()
                 .then(
                 updatedOrder => {
-                    return updatedOrder.populate('foods.food').populate('table').execPopulate()
+                    return updatedOrder.populate('foods.food')
+                        .populate('foods.kitchen')
+                        .populate('foods.staff')
+                        .populate('table')
+                        .execPopulate()
                         .then(
                         (populatedOrder) => {
                             return Promise.resolve(populatedOrder);
@@ -83,7 +94,10 @@ function updateOrder(order: IOrder): Promise<any> {
 }
 
 function getOrderById(orderId: string): Promise<any> {
-    return OrderModel.findOne({ _id: orderId }).populate('foods.food').populate('table')
+    return OrderModel.findOne({ _id: orderId }).populate('foods.food')
+        .populate('foods.kitchen')
+        .populate('foods.staff')
+        .populate('table')
         .then((order) => {
             if (order) {
                 return Promise.resolve(order);
@@ -131,7 +145,10 @@ function getOriginOrderById(orderId: string): Promise<any> {
 }
 
 function getOrderByTable(tableId: string): Promise<any> {
-    return OrderModel.find({ table: tableId }).populate('foods.food').populate('table')
+    return OrderModel.find({ table: tableId }).populate('foods.food')
+        .populate('foods.kitchen')
+        .populate('foods.staff')
+        .populate('table')
         .then((orders) => {
             return Promise.resolve(orders);
         })

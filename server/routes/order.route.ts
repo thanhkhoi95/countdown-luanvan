@@ -32,7 +32,7 @@ orderRouter.route('/').post(
 // );
 
 orderRouter.route('/orderstatus').put(
-    parseJwt('staff', 'kitchen', 'table'),
+    parseJwt('staff'),
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         orderController.changeOrderStatus(req)
         .then((response) => {
