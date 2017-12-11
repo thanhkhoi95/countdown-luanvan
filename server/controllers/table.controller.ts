@@ -224,12 +224,12 @@ function updateStatus(request: express.Request): Promise<ISuccess | IError> {
             request.query.tableid = request.query.id;
             return orderController.getNewestOrderByTableId(request)
                 .then((res) => {
-                    // if (res['data'].order && res['data'].order.status === 'serving') {
-                    //     return Promise.reject({
-                    //         statusCode: 550,
-                    //         message: 'Permission denied'
-                    //     });
-                    // }
+                    if (res['data'].order && res['data'].order.status === 'serving') {
+                        return Promise.reject({
+                            statusCode: 550,
+                            message: 'Permission denied'
+                        });
+                    }
                     return tableDao.updateTable(table)
                         .then(
                         (updatedTable) => {

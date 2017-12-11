@@ -8,6 +8,8 @@ interface FoodRef {
     status: string;
     kitchen?: string;
     staff?: string;
+    trans_ref?: string;
+    device?: string;
 }
 
 export interface IOrder {
@@ -54,14 +56,20 @@ const orderSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'table'
         },
-        staff: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'staff'
-        },
         date: {
             type: Date
         },
         status: {
+            type: String
+        },
+        staff: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'staff'
+        },
+        device: {
+            type: String
+        },
+        trans_ref: {
             type: String
         }
     },

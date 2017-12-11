@@ -4,6 +4,10 @@ import { orderDao, foodDao, tableDao } from '../dao';
 import { tableController } from '../controllers';
 import { IError, ISuccess } from '../shared';
 import { IOrder, TableModel } from '../models';
+import * as crypto from 'crypto';
+import config from '../config';
+import * as rq from 'request';
+import { io } from '../app';
 
 function addOrder(request: express.Request): Promise<ISuccess | IError> {
     if (!request.body.foods || !request.body.table) {
@@ -285,7 +289,7 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
                             if (request.body.authInfo.staff) {
                                 if (request.body.authInfo.staff.id !== order.foods[i].staff.toString() &&
                                     order.foods[i].status === 'delivered') {
-                                        console.log(1);
+                                    console.log(1);
                                     return Promise.reject({
                                         statusCode: 550,
                                         message: 'Permission denied'
@@ -296,7 +300,7 @@ function changeFoodStatus(request: express.Request): Promise<ISuccess | IError> 
                                 console.log(2);
                                 if (order.foods[i].status === 'cocking' &&
                                     order.foods[i].kitchen.toString() !== request.body.authInfo.kitchen.id) {
-                                        console.log(3);
+                                    console.log(3);
                                     return Promise.reject({
                                         statusCode: 550,
                                         message: 'Permission denied'
@@ -427,6 +431,131 @@ function getNewestOrderByTableId(req: express.Request): Promise<ISuccess | IErro
         });
 }
 
+function onlineCheckout(req: express.Request) {
+    console.log('go go go');
+    return orderDao.getOrderByTable(req.query.id)
+        .then((orders) => {
+            console.log(orders);
+            if (orders.length <= 0) {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'Invalid checkout request'
+                });
+            }
+            orders.sort((a, b) => {
+                return b.date - a.date;
+            });
+            const order = orders[0];
+            console.log('go to this');
+            if (order.status !== 'serving') {
+                return Promise.reject({
+                    statusCode: 400,
+                    message: 'Invalid checkout request'
+                });
+            } else {
+                let total = 0;
+                for (const i in order.foods) {
+                    if (i) {
+                        total += order.foods[i].price * order.foods[i].quantity;
+                    }
+                }
+                let url = 'http://api.1pay.vn/bank-charging/service/v2?';
+                let signature = '';
+                signature += 'access_key=' + config.checkout.access_key;
+                signature += '&amount=' + 50000;
+                signature += '&command=request_transaction';
+                signature += '&order_id=' + order.id;
+                signature += '&order_info=' + 'Thanh_toan_truc_tuyen_nha_hang';
+                signature += '&return_url=' + 'http://localhost:6969/api/order/checkoutru';
+                url += '' + signature;
+                const hmac = crypto.createHmac('SHA256', config.checkout.secret);
+                signature = hmac.update(signature).digest('hex');
+                url += '&signature=' + signature;
+                console.log(url);
+                const options = {
+                    url: url,
+                    method: 'POST'
+                };
+                order.device = req.body.authInfo.role;
+                order.status = 'checking out';
+                console.log('go to this');
+                return orderDao.updateOrder(order as IOrder)
+                    .then(() => {
+                        const promise = new Promise<any>((resolve, reject) => {
+                            rq(options, (err, response, body) => {
+                                if (response && response.statusCode === 200) {
+                                    resolve(JSON.parse(body));
+                                } else {
+                                    reject({
+                                        statusCode: 500,
+                                        message: 'Internal server error'
+                                    });
+                                }
+                            });
+                        });
+                        return promise;
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+        })
+        .catch(err => {
+            Promise.reject(err);
+        });
+}
+
+function checkoutReturnUrl(req: express.Request) {
+    let signature = '';
+    signature += 'access_key=' + req.query.access_key;
+    signature += '&amount=' + req.query.amount;
+    signature += '&card_name=' + req.query.card_name;
+    signature += '&card_type=' + req.query.card_type;
+    signature += '&order_id=' + req.query.order_id;
+    signature += '&order_info=' + req.query.order_info;
+    signature += '&order_type=' + req.query.order_type;
+    signature += '&request_time=' + req.query.request_time;
+    signature += '&response_code=' + req.query.response_code;
+    signature += '&response_message=' + req.query.response_message;
+    signature += '&response_time=' + req.query.response_time;
+    signature += '&trans_ref=' + req.query.trans_ref;
+    signature += '&trans_status=' + req.query.trans_status;
+    const hmac = crypto.createHmac('SHA256', config.checkout.secret);
+    // if (signature === hmac.update(signature).digest('hex')) {
+    return orderDao.getOrderById(req.query.order_id)
+        .then((order) => {
+            if (parseInt(req.query.response_code, 10) === 0) {
+                order.trans_ref = req.query.trans_ref;
+                order.status = 'checked out';
+                return orderDao.updateOrder(order as IOrder)
+                    .then(() => {
+                        io.to(order.table.id).emit('order:checkout', order);
+                        return Promise.resolve('http://localhost:4321/welcome');
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            } else {
+                order.status = 'serving';
+                return orderDao.updateOrder(order as IOrder)
+                    .then(() => {
+                        if (order.device === 'table') {
+                            return Promise.resolve('http://localhost:4321/bill');
+                        } else {
+                            return Promise.resolve('http://localhost:4321/staff/bill/' + order.id);
+                        }
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+        })
+        .catch(err => {
+            Promise.reject(err);
+        });
+    // }
+}
+
 export const orderController = {
     addOrder: addOrder,
     getOrderById: getOrderById,
@@ -435,6 +564,8 @@ export const orderController = {
     addMoreFood: addMoreFood,
     changeOrderStatus: changeOrderStatus,
     changeFoodStatus: changeFoodStatus,
-    getNewestOrderByTableId: getNewestOrderByTableId
+    getNewestOrderByTableId: getNewestOrderByTableId,
+    onlineCheckout: onlineCheckout,
+    checkoutReturnUrl: checkoutReturnUrl
     // updateOrder: updateOrder
 };

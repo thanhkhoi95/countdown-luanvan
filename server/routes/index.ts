@@ -8,3 +8,4 @@ export * from './food.route';
 export * from './assignment.route';
 export * from './image.route';
 export * from './order.route';
+export * from './test.route';

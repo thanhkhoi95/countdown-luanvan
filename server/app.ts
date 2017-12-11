@@ -19,7 +19,8 @@ import {
     foodRouter,
     assignmentRouter,
     imageRouter,
-    orderRouter
+    orderRouter,
+    testRouter
 } from './routes';
 
 const app = express();
@@ -78,12 +79,11 @@ db.once('open', () => {
     app.use(`${app.get('baseUri')}/assignment`, assignmentRouter);
     app.use(`${app.get('baseUri')}/image`, imageRouter);
     app.use(`${app.get('baseUri')}/order`, orderRouter);
+    app.use(`${app.get('baseUri')}/test`, testRouter);
 
-    app.get('/*', function(req, res) {
-      res.sendFile(path.join(__dirname, '../public/index.html'));
+    app.get('/*', function (req, res) {
+        res.sendFile(path.join(__dirname, '../public/index.html'));
     });
-
-    socketHandler(server);
 
     if (!module.parent) {
         server.listen(app.get('port'), () => {
@@ -93,4 +93,7 @@ db.once('open', () => {
 
 });
 
-export { app, server };
+const io = socketIO(server);
+socketHandler(io);
+
+export { app, server, io };

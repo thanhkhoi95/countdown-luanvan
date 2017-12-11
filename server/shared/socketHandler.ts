@@ -1,9 +1,7 @@
-import * as socketIO from 'socket.io';
 import { tokenVerify } from './jwt.utils';
 import { assignmentDao, tableDao } from '../dao';
 
-export function socketHandler(server) {
-    const io = socketIO(server);
+export function socketHandler(io) {
     io.on('connection', socket => {
         console.log(`${socket.id} is connected`);
         const token = socket.handshake.query.token;
@@ -77,6 +75,11 @@ export function socketHandler(server) {
 
         socket.on('table:support', data => {
             socket.to(data._id).emit('table:support', data);
+        });
+
+        socket.on('table:checkout', data => {
+            console.log(data);
+            socket.to(data._id).emit('table:checkout', data);
         });
 
         socket.on('disconnect', () => {
