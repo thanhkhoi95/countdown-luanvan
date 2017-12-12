@@ -126,6 +126,7 @@ orderRouter.route('/checkoutru').get(
     (req: express.Request, res: express.Response, next: express.NextFunction) => {
         orderController.checkoutReturnUrl(req)
             .then((response) => {
+                console.log(response);
                     res.send(`<body>
                             <script>
                                 setTimeout(function(){

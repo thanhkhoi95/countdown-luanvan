@@ -178,7 +178,7 @@ function addMoreFood(request: express.Request): Promise<ISuccess | IError> {
                     foods: [...request.body.foods, ...responsedOrder.foods],
                     table: responsedOrder.table,
                     date: responsedOrder.date,
-                    status: 'ordered'
+                    status: 'serving'
                 };
                 return orderDao.updateOrder(order)
                     .then((response) => {
@@ -435,7 +435,6 @@ function onlineCheckout(req: express.Request) {
     console.log('go go go');
     return orderDao.getOrderByTable(req.query.id)
         .then((orders) => {
-            console.log(orders);
             if (orders.length <= 0) {
                 return Promise.reject({
                     statusCode: 400,
@@ -448,21 +447,20 @@ function onlineCheckout(req: express.Request) {
             const order = orders[0];
             console.log('go to this');
             if (order.status !== 'serving') {
+                console.log('go to this 2');
                 return Promise.reject({
                     statusCode: 400,
                     message: 'Invalid checkout request'
                 });
             } else {
                 let total = 0;
-                for (const i in order.foods) {
-                    if (i) {
-                        total += order.foods[i].price * order.foods[i].quantity;
-                    }
+                for (let i = 0; i < order.foods.length; i++) {
+                    total += order.foods[i].price * order.foods[i].quantity;
                 }
                 let url = 'http://api.1pay.vn/bank-charging/service/v2?';
                 let signature = '';
                 signature += 'access_key=' + config.checkout.access_key;
-                signature += '&amount=' + 50000;
+                signature += '&amount=' + total;
                 signature += '&command=request_transaction';
                 signature += '&order_id=' + order.id;
                 signature += '&order_info=' + 'Thanh_toan_truc_tuyen_nha_hang';
@@ -539,6 +537,7 @@ function checkoutReturnUrl(req: express.Request) {
                 order.status = 'serving';
                 return orderDao.updateOrder(order as IOrder)
                     .then(() => {
+                        console.log(order);
                         if (order.device === 'table') {
                             return Promise.resolve('http://localhost:4321/bill');
                         } else {

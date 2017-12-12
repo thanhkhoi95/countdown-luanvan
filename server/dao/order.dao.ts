@@ -50,6 +50,9 @@ function updateOrder(order: IOrder): Promise<any> {
             responsedOrder.foods = order.foods;
             responsedOrder.table = order.table;
             responsedOrder.status = order.status;
+            responsedOrder.device = order.device;
+            responsedOrder.trans_ref = order.trans_ref;
+            responsedOrder.staff = order.staff;
             return responsedOrder.save()
                 .then(
                 updatedOrder => {

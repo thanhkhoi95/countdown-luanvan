@@ -8,8 +8,6 @@ interface FoodRef {
     status: string;
     kitchen?: string;
     staff?: string;
-    trans_ref?: string;
-    device?: string;
 }
 
 export interface IOrder {
@@ -19,6 +17,8 @@ export interface IOrder {
     date: Date;
     status: String;
     staff?: string;
+    trans_ref?: string;
+    device?: string;
 }
 
 export interface IOrderModel extends IOrder, mongoose.Document { }
