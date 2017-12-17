@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var dao_1 = require("../dao");
+var controllers_1 = require("../controllers");
 function getAllTable(request, active) {
     if (!active) {
         return dao_1.tableDao.getAllTables()
@@ -189,12 +190,33 @@ function updateStatus(request) {
             status: request.body.status || responsedTable.status,
             active: responsedTable.active
         };
-        return dao_1.tableDao.updateTable(table)
-            .then(function (updatedTable) {
-            return Promise.resolve({
-                message: 'Update table successfully.',
-                data: {
-                    table: updatedTable
+        request.query.tableid = request.query.id;
+        return controllers_1.orderController.getNewestOrderByTableId(request)
+            .then(function (res) {
+            if (res['data'].order && res['data'].order.status === 'serving') {
+                return Promise.reject({
+                    statusCode: 550,
+                    message: 'Permission denied'
+                });
+            }
+            return dao_1.tableDao.updateTable(table)
+                .then(function (updatedTable) {
+                return Promise.resolve({
+                    message: 'Update table successfully.',
+                    data: {
+                        table: updatedTable
+                    }
+                });
+            })
+                .catch(function (error) {
+                if (!error.statusCode) {
+                    return Promise.reject({
+                        statusCode: 500,
+                        message: 'Internal server error.'
+                    });
+                }
+                else {
+                    return Promise.reject(error);
                 }
             });
         })

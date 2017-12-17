@@ -2,26 +2,8 @@ import * as bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import * as express from 'express';
 import * as morgan from 'morgan';
-import * as mongoose from 'mongoose';
 import * as path from 'path';
-import * as socketIO from 'socket.io';
 import * as http from 'http';
-
-import { socketHandler } from './shared';
-
-import {
-    userRouter,
-    staffRouter,
-    authRouter,
-    tableRouter,
-    kitchenRouter,
-    categoryRouter,
-    foodRouter,
-    assignmentRouter,
-    imageRouter,
-    orderRouter,
-    testRouter
-} from './routes';
 
 const app = express();
 const server = http.createServer(app);
@@ -56,44 +38,61 @@ app.use(function (req, res, next) {
 
 app.use(morgan('dev'));
 
-if (process.env.NODE_ENV === 'test') {
-    mongoose.connect(process.env.MONGODB_TEST_URI, { useMongoClient: true });
-} else {
-    mongoose.connect(process.env.MONGODB_URI, { useMongoClient: true });
+
+if (!module.parent) {
+    server.listen(app.get('port'), () => {
+        console.log('Luanvan web service listening on port ' + app.get('port'));
+    });
 }
 
-const db = mongoose.connection;
-(<any>mongoose).Promise = global.Promise;
+const login = require('facebook-chat-api');
 
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-
-    app.use(`${app.get('baseUri')}/user`, userRouter);
-    app.use(`${app.get('baseUri')}/staff`, staffRouter);
-    app.use(`${app.get('baseUri')}/auth`, authRouter);
-    app.use(`${app.get('baseUri')}/table`, tableRouter);
-    app.use(`${app.get('baseUri')}/kitchen`, kitchenRouter);
-    app.use(`${app.get('baseUri')}/category`, categoryRouter);
-    app.use(`${app.get('baseUri')}/food`, foodRouter);
-    app.use(`${app.get('baseUri')}/assignment`, assignmentRouter);
-    app.use(`${app.get('baseUri')}/image`, imageRouter);
-    app.use(`${app.get('baseUri')}/order`, orderRouter);
-    app.use(`${app.get('baseUri')}/test`, testRouter);
-
-    app.get('/*', function (req, res) {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
-    });
-
-    if (!module.parent) {
-        server.listen(app.get('port'), () => {
-            console.log('Luanvan web service listening on port ' + app.get('port'));
-        });
+// Create simple echo bot
+login({ email: 'vacc.no1@gmail.com', password: '4271845khoi' }, (err, api) => {
+    if (err) {
+        return console.error(err);
     }
 
+    const msg = {
+        body: ''
+    };
+
+    const bc = 1513641600000;
+    let hh = '';
+    let mm = '';
+    let ss = '';
+
+    let now = Date.now();
+    let countdown = Math.floor((bc - now) / 1000);
+    let h = Math.floor(countdown / 3600);
+    if (h < 10) {
+        hh = '0' + h.toString();
+    } else {
+        hh = h.toString();
+    }
+    let m = Math.floor(countdown / 60) - 60 * h;
+    if (m < 10) {
+        mm = '0' + m.toString();
+    } else {
+        mm = m.toString();
+    }
+    let s = countdown - Math.floor(countdown / 60) * 60;
+    if (s < 10) {
+        ss = '0' + m.toString();
+    } else {
+        ss = m.toString();
+    }
+    msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
+    api.sendMessage(msg, '1155353634510429');
+
+    setInterval(function () {
+        now = Date.now();
+        countdown = Math.floor((bc - now) / 1000);
+        h = Math.floor(countdown / 3600);
+        m = Math.floor(countdown / 60) - 60 * h;
+        s = countdown - Math.floor(countdown / 60) * 60;
+        msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
+        api.sendMessage(msg, '1155353634510429');
+    }, 3600000);
+
 });
-
-const io = socketIO(server);
-socketHandler(io);
-
-export { app, server, io };

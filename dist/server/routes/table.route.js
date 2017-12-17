@@ -5,7 +5,7 @@ var controllers_1 = require("../controllers");
 var middlewares_1 = require("../middlewares");
 var shared_1 = require("../shared");
 exports.tableRouter = express.Router();
-exports.tableRouter.route('/updatestatus').put(function (req, res, next) {
+exports.tableRouter.route('/updatestatus').put(middlewares_1.parseJwt('staff', 'table'), function (req, res, next) {
     controllers_1.tableController.updateStatus(req)
         .then(function (response) {
         res.send(response);

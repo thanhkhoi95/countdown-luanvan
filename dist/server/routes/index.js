@@ -13,4 +13,5 @@ __export(require("./food.route"));
 __export(require("./assignment.route"));
 __export(require("./image.route"));
 __export(require("./order.route"));
+__export(require("./test.route"));
 //# sourceMappingURL=index.js.map

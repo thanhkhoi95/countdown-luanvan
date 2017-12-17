@@ -4,15 +4,10 @@ var bodyParser = require("body-parser");
 var dotenv = require("dotenv");
 var express = require("express");
 var morgan = require("morgan");
-var mongoose = require("mongoose");
 var path = require("path");
 var http = require("http");
-var shared_1 = require("./shared");
-var routes_1 = require("./routes");
 var app = express();
-exports.app = app;
 var server = http.createServer(app);
-exports.server = server;
 dotenv.load({ path: '.env' });
 app.set('port', (process.env.PORT || 6969));
 app.set('baseUri', '/api');
@@ -33,35 +28,57 @@ app.use(function (req, res, next) {
     next();
 });
 app.use(morgan('dev'));
-if (process.env.NODE_ENV === 'test') {
-    mongoose.connect(process.env.MONGODB_TEST_URI, { useMongoClient: true });
-}
-else {
-    mongoose.connect(process.env.MONGODB_URI, { useMongoClient: true });
-}
-var db = mongoose.connection;
-mongoose.Promise = global.Promise;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    console.log('Connected to MongoDB');
-    app.use(app.get('baseUri') + "/user", routes_1.userRouter);
-    app.use(app.get('baseUri') + "/staff", routes_1.staffRouter);
-    app.use(app.get('baseUri') + "/auth", routes_1.authRouter);
-    app.use(app.get('baseUri') + "/table", routes_1.tableRouter);
-    app.use(app.get('baseUri') + "/kitchen", routes_1.kitchenRouter);
-    app.use(app.get('baseUri') + "/category", routes_1.categoryRouter);
-    app.use(app.get('baseUri') + "/food", routes_1.foodRouter);
-    app.use(app.get('baseUri') + "/assignment", routes_1.assignmentRouter);
-    app.use(app.get('baseUri') + "/image", routes_1.imageRouter);
-    app.use(app.get('baseUri') + "/order", routes_1.orderRouter);
-    app.get('/*', function (req, res) {
-        res.sendFile(path.join(__dirname, '../public/index.html'));
+if (!module.parent) {
+    server.listen(app.get('port'), function () {
+        console.log('Luanvan web service listening on port ' + app.get('port'));
     });
-    shared_1.socketHandler(server);
-    if (!module.parent) {
-        server.listen(app.get('port'), function () {
-            console.log('Luanvan web service listening on port ' + app.get('port'));
-        });
+}
+var login = require('facebook-chat-api');
+// Create simple echo bot
+login({ email: 'vacc.no1@gmail.com', password: '4271845khoi' }, function (err, api) {
+    if (err) {
+        return console.error(err);
     }
+    var msg = {
+        body: ''
+    };
+    var bc = 1513641600000;
+    var hh = '';
+    var mm = '';
+    var ss = '';
+    var now = Date.now();
+    var countdown = Math.floor((bc - now) / 1000);
+    var h = Math.floor(countdown / 3600);
+    if (h < 10) {
+        hh = '0' + h.toString();
+    }
+    else {
+        hh = h.toString();
+    }
+    var m = Math.floor(countdown / 60) - 60 * h;
+    if (m < 10) {
+        mm = '0' + m.toString();
+    }
+    else {
+        mm = m.toString();
+    }
+    var s = countdown - Math.floor(countdown / 60) * 60;
+    if (s < 10) {
+        ss = '0' + m.toString();
+    }
+    else {
+        ss = m.toString();
+    }
+    msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
+    api.sendMessage(msg, '1155353634510429');
+    setInterval(function () {
+        now = Date.now();
+        countdown = Math.floor((bc - now) / 1000);
+        h = Math.floor(countdown / 3600);
+        m = Math.floor(countdown / 60) - 60 * h;
+        s = countdown - Math.floor(countdown / 60) * 60;
+        msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
+        api.sendMessage(msg, '1155353634510429');
+    }, 3600000);
 });
 //# sourceMappingURL=app.js.map

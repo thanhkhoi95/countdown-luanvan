@@ -25,7 +25,7 @@ exports.orderRouter.route('/').post(middlewares_1.parseJwt('staff', 'table'), fu
 //         });
 //     }
 // );
-exports.orderRouter.route('/orderstatus').put(middlewares_1.parseJwt('staff', 'kitchen', 'table'), function (req, res, next) {
+exports.orderRouter.route('/orderstatus').put(middlewares_1.parseJwt('staff'), function (req, res, next) {
     controllers_1.orderController.changeOrderStatus(req)
         .then(function (response) {
         res.send(response);
@@ -77,6 +77,25 @@ exports.orderRouter.route('/newest').get(middlewares_1.parseJwt('staff', 'kitche
     })
         .catch(function (error) {
         res.status(error.statusCode).send(error);
+    });
+});
+exports.orderRouter.route('/onlinecheckout').get(middlewares_1.parseJwt('staff', 'table'), function (req, res, next) {
+    controllers_1.orderController.onlineCheckout(req)
+        .then(function (response) {
+        res.send({ url: response.pay_url });
+    })
+        .catch(function (error) {
+        res.status(400).send(error);
+    });
+});
+exports.orderRouter.route('/checkoutru').get(function (req, res, next) {
+    controllers_1.orderController.checkoutReturnUrl(req)
+        .then(function (response) {
+        console.log(response);
+        res.send("<body>\n                            <script>\n                                setTimeout(function(){\n                                    document.location.replace('" + response + "');\n                                }, 200);\n                            </script>\n                        </body>");
+    })
+        .catch(function (error) {
+        res.status(400).send(error);
     });
 });
 //# sourceMappingURL=order.route.js.map

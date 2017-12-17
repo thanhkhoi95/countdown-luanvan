@@ -1,10 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var socketIO = require("socket.io");
 var jwt_utils_1 = require("./jwt.utils");
 var dao_1 = require("../dao");
-function socketHandler(server) {
-    var io = socketIO(server);
+function socketHandler(io) {
     io.on('connection', function (socket) {
         console.log(socket.id + " is connected");
         var token = socket.handshake.query.token;
@@ -73,6 +71,10 @@ function socketHandler(server) {
         });
         socket.on('table:support', function (data) {
             socket.to(data._id).emit('table:support', data);
+        });
+        socket.on('table:checkout', function (data) {
+            console.log(data);
+            socket.to(data._id).emit('table:checkout', data);
         });
         socket.on('disconnect', function () {
             console.log(socket.id + " has been disconnected.");

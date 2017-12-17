@@ -53,6 +53,7 @@ function login(request) {
                             });
                         }
                         staff.role = 'staff';
+                        staff._id = staff.id;
                         var tokenObject = {
                             role: 'staff',
                             userId: user.id,
@@ -92,6 +93,7 @@ function login(request) {
                             });
                         }
                         kitchen.role = 'kitchen';
+                        kitchen._id = kitchen.id;
                         var tokenObject = {
                             role: 'kitchen',
                             userId: user.id,

@@ -20,6 +20,14 @@ var orderSchema = new mongoose.Schema({
             status: {
                 type: String
             },
+            kitchen: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'kitchen'
+            },
+            staff: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'staff'
+            }
         }],
     table: {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,6 +37,16 @@ var orderSchema = new mongoose.Schema({
         type: Date
     },
     status: {
+        type: String
+    },
+    staff: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'staff'
+    },
+    device: {
+        type: String
+    },
+    trans_ref: {
         type: String
     }
 }, {
