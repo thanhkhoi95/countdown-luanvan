@@ -4,6 +4,7 @@ import * as express from 'express';
 import * as morgan from 'morgan';
 import * as path from 'path';
 import * as http from 'http';
+import * as fs from 'fs';
 
 const app = express();
 const server = http.createServer(app);
@@ -47,8 +48,7 @@ if (!module.parent) {
 
 const login = require('facebook-chat-api');
 
-// Create simple echo bot
-login({ email: 'vacc.no1@gmail.com', password: '4271845khoi' }, (err, api) => {
+login({ appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) }, (err, api) => {
     if (err) {
         return console.error(err);
     }

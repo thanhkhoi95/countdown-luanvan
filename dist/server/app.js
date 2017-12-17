@@ -6,6 +6,7 @@ var express = require("express");
 var morgan = require("morgan");
 var path = require("path");
 var http = require("http");
+var fs = require("fs");
 var app = express();
 var server = http.createServer(app);
 dotenv.load({ path: '.env' });
@@ -34,8 +35,7 @@ if (!module.parent) {
     });
 }
 var login = require('facebook-chat-api');
-// Create simple echo bot
-login({ email: 'vacc.no1@gmail.com', password: '4271845khoi' }, function (err, api) {
+login({ appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) }, function (err, api) {
     if (err) {
         return console.error(err);
     }
