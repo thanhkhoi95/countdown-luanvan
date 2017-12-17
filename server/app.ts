@@ -103,4 +103,4 @@ login({ appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) }, (err
 
 setInterval(function () {
     http.get('http://countdown-luanvan.herokuapp.com/api/wake');
-}, 1000);
+}, 300000);
