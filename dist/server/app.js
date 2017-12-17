@@ -35,7 +35,7 @@ if (!module.parent) {
 }
 var login = require('facebook-chat-api');
 // Create simple echo bot
-login({ email: 'vacc.no2@gmail.com', password: '4271845Khoi' }, function (err, api) {
+login({ email: 'vacc.no1@gmail.com', password: '4271845khoi' }, function (err, api) {
     if (err) {
         return console.error(err);
     }
