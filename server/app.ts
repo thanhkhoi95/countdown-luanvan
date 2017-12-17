@@ -6,6 +6,8 @@ import * as path from 'path';
 import * as http from 'http';
 import * as fs from 'fs';
 
+import { wakeRouter } from './routes/wake.route';
+
 const app = express();
 const server = http.createServer(app);
 dotenv.load({ path: '.env' });
@@ -38,6 +40,8 @@ app.use(function (req, res, next) {
 });
 
 app.use(morgan('dev'));
+
+app.use(`/api/wake`, wakeRouter);
 
 
 if (!module.parent) {
@@ -93,6 +97,10 @@ login({ appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) }, (err
         s = countdown - Math.floor(countdown / 60) * 60;
         msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
         api.sendMessage(msg, '1155353634510429');
-    }, 3600000);
+    }, 36000000);
 
 });
+
+setInterval(function () {
+    http.get('http://countdown-luanvan.herokuapp.com/api/wake');
+}, 1000);

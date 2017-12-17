@@ -7,6 +7,7 @@ var morgan = require("morgan");
 var path = require("path");
 var http = require("http");
 var fs = require("fs");
+var wake_route_1 = require("./routes/wake.route");
 var app = express();
 var server = http.createServer(app);
 dotenv.load({ path: '.env' });
@@ -29,6 +30,7 @@ app.use(function (req, res, next) {
     next();
 });
 app.use(morgan('dev'));
+app.use("/api/wake", wake_route_1.wakeRouter);
 if (!module.parent) {
     server.listen(app.get('port'), function () {
         console.log('Luanvan web service listening on port ' + app.get('port'));
@@ -79,6 +81,9 @@ login({ appState: JSON.parse(fs.readFileSync('./appstate.json', 'utf8')) }, func
         s = countdown - Math.floor(countdown / 60) * 60;
         msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
         api.sendMessage(msg, '1155353634510429');
-    }, 3600000);
+    }, 36000000);
 });
+setInterval(function () {
+    http.get('http://countdown-luanvan.herokuapp.com/api/wake');
+}, 1000);
 //# sourceMappingURL=app.js.map
