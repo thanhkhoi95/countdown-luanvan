@@ -72,7 +72,7 @@ setInterval(function () {
         else {
             ss = m.toString();
         }
-        msg.body = 'Còn ' + h + ':' + m + ':' + s + ' nữa là tới giờ quẫy òy mấy má ới...';
+        msg.body = 'Còn ' + hh + ':' + mm + ':' + ss + ' nữa là tới giờ quẫy òy mấy má ới...';
         api.sendMessage(msg, '1155353634510429');
     });
 }, 3600000);
